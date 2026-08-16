@@ -2,7 +2,7 @@
 
 > Map, queue, deque, set и copy-on-write
 
-← [Зачем ConcurrentHashMap](./15-concurrent-hash-map.md) · [Почему get и put недостаточно](./16-operation-composition.md) →
+← [synchronizedMap: безопасная очередь](./14-synchronized-map.md) · [Зачем ConcurrentHashMap](./15-concurrent-hash-map.md) →
 
 Обычные `ArrayList`, `HashMap` и `ArrayDeque` не предназначены для конкурентного изменения. Если несколько потоков работают с одной коллекцией, недостаточно выбрать любой класс со словом `Concurrent` в названии: разные коллекции решают разные задачи.
 
@@ -166,8 +166,8 @@ synchronized (values) {
 
 ## Дальше
 
-Вернёмся к `ConcurrentHashMap` и проверим, почему два безопасных вызова `get()` и `put()` не образуют безопасное увеличение счётчика.
+Для нашего счётчика нужен быстрый доступ по ключу без сортировки и ожидания. Из общей карты коллекций выберем `ConcurrentHashMap` и разберём её отдельно.
 
 ---
 
-← [Зачем ConcurrentHashMap](./15-concurrent-hash-map.md) · [Почему get и put недостаточно](./16-operation-composition.md) →
+← [synchronizedMap: безопасная очередь](./14-synchronized-map.md) · [Зачем ConcurrentHashMap](./15-concurrent-hash-map.md) →

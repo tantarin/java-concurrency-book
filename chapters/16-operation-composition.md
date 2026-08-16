@@ -2,7 +2,7 @@
 
 > Композиция операций
 
-← [Какие конкурентные коллекции есть в Java](./15-concurrent-collections-overview.md) · [Атомарные compute и merge](./17-compute-and-merge.md) →
+← [Зачем ConcurrentHashMap](./15-concurrent-hash-map.md) · [Атомарные compute и merge](./17-compute-and-merge.md) →
 
 Вернём прежний код, но теперь с `ConcurrentHashMap`:
 
@@ -30,4 +30,4 @@ ConcurrentHashMap предоставляет готовые составные �
 
 ---
 
-← [Какие конкурентные коллекции есть в Java](./15-concurrent-collections-overview.md) · [Атомарные compute и merge](./17-compute-and-merge.md) →
+← [Зачем ConcurrentHashMap](./15-concurrent-hash-map.md) · [Атомарные compute и merge](./17-compute-and-merge.md) →

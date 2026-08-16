@@ -2,7 +2,7 @@
 
 > Конкурентная коллекция
 
-← [synchronizedMap: безопасная очередь](./14-synchronized-map.md) · [Какие конкурентные коллекции есть в Java](./15-concurrent-collections-overview.md) →
+← [Какие конкурентные коллекции есть в Java](./15-concurrent-collections-overview.md) · [Почему get и put недостаточно](./16-operation-composition.md) →
 
 `ConcurrentHashMap` предназначена для работы нескольких потоков. Она не сводит все чтения и обновления к одному общему монитору, поэтому независимые операции обычно меньше блокируют друг друга.
 
@@ -23,8 +23,8 @@ Map<String, Integer> views =
 
 ## Дальше
 
-Расширим картину: кроме Map, в Java есть конкурентные списки, множества и несколько семейств очередей.
+Проверим старый код get → вычисление → put. Потерянный инкремент неожиданно вернётся.
 
 ---
 
-← [synchronizedMap: безопасная очередь](./14-synchronized-map.md) · [Какие конкурентные коллекции есть в Java](./15-concurrent-collections-overview.md) →
+← [Какие конкурентные коллекции есть в Java](./15-concurrent-collections-overview.md) · [Почему get и put недостаточно](./16-operation-composition.md) →

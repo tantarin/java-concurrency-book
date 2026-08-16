@@ -24,8 +24,8 @@
 14. [Happens-before простыми словами](./chapters/12-happens-before.md) — JLS 17.4.5
 15. [Когда одного счётчика мало](./chapters/13-shared-map.md) — Переходим к Map
 16. [synchronizedMap: безопасная очередь](./chapters/14-synchronized-map.md) — Один общий lock
-17. [Зачем ConcurrentHashMap](./chapters/15-concurrent-hash-map.md) — Конкурентная коллекция
-18. [Какие конкурентные коллекции есть в Java](./chapters/15-concurrent-collections-overview.md) — Map, queue, deque, set и copy-on-write
+17. [Какие конкурентные коллекции есть в Java](./chapters/15-concurrent-collections-overview.md) — Map, queue, deque, set и copy-on-write
+18. [Зачем ConcurrentHashMap](./chapters/15-concurrent-hash-map.md) — Конкурентная коллекция
 19. [Почему get и put недостаточно](./chapters/16-operation-composition.md) — Композиция операций
 20. [Атомарные compute и merge](./chapters/17-compute-and-merge.md) — Правильное обновление
 21. [Executor: задача отдельно от потока](./chapters/18-executor.md) — Пулы потоков
