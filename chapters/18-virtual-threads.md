@@ -1,0 +1,303 @@
+# Виртуальные потоки в Java
+
+> Virtual threads, carrier threads и блокирующий I/O
+
+← [Executor: задача отдельно от потока](./18-executor.md) · [Как рассуждать о многопоточном коде](./19-reasoning-about-concurrency.md) →
+
+## Зачем понадобились ещё одни потоки
+
+Platform thread (платформенный поток) обычно связан с потоком операционной системы один к одному. Это универсальный, но сравнительно дорогой ресурс: каждому потоку нужны нативные структуры и stack.
+
+Пулы помогают ограничить число platform threads, но вместе с ограничением потоков ограничивают число задач, которые могут одновременно ждать блокирующий I/O:
+
+```text
+pool из 4 platform threads
+
+worker 1 → ждёт HTTP
+worker 2 → ждёт JDBC
+worker 3 → ждёт файл
+worker 4 → ждёт HTTP
+
+новая задача → остаётся в очереди,
+хотя процессор почти не занят
+```
+
+Большинство workers ничего не вычисляют — они ожидают сеть, базу или диск. Но пока platform thread заблокирован, его нельзя использовать для другой задачи.
+
+**Virtual thread (виртуальный поток)** — лёгкий поток, которым управляет JDK, а не операционная система напрямую. Он позволяет сохранить простой последовательный код с блокирующими вызовами и одновременно обслуживать очень много ожидающих задач.
+
+## Когда появились virtual threads
+
+Virtual threads впервые появились как preview feature (предварительная возможность) в JDK 19, ещё раз прошли preview в JDK 20 и стали финальной частью платформы в **Java 21** через [JEP 444](https://openjdk.org/jeps/444).
+
+Для их использования без preview-флагов нужна Java 21 или новее:
+
+```bash
+java --version
+```
+
+Основные API находятся в двух знакомых местах:
+
+```java
+java.lang.Thread
+java.util.concurrent.Executors
+```
+
+Virtual thread не является отдельным классом. Это всё тот же объект `java.lang.Thread`, для которого `thread.isVirtual()` возвращает `true`.
+
+## Platform thread и virtual thread
+
+| Свойство | Platform thread | Virtual thread |
+|---|---|---|
+| Кто реализует | ОС и JVM | JDK |
+| Связь с OS thread | обычно один к одному | много virtual threads используют меньшее число OS threads |
+| Стоимость создания | сравнительно высокая | низкая |
+| Обычный срок жизни | долгий, переиспользуется | часто равен одной задаче |
+| Нужно объединять в пул | часто да | нет |
+| Хороший сценарий | любые задачи, особенно ограниченное CPU-вычисление | множество задач, ожидающих блокирующий I/O |
+
+Virtual thread не отменяет platform threads. Чтобы выполнить машинные инструкции, ему всё равно нужен настоящий поток ОС.
+
+## Carrier thread: поток-носитель
+
+JVM scheduler (планировщик JVM) назначает virtual thread на platform thread. Такой platform thread называется **carrier thread (поток-носитель)**.
+
+```text
+virtual thread 1 ─┐
+virtual thread 2 ─┼── планировщик JVM ──→ carrier 1 ──→ OS thread
+virtual thread 3 ─┤
+virtual thread 4 ─┘                    └→ carrier 2 ──→ OS thread
+```
+
+Когда virtual thread начинает исполняться на carrier, это называется **mounting (монтирование)**. Когда он освобождает carrier — **unmounting (размонтирование)**.
+
+При поддерживаемом блокирующем I/O происходит следующее:
+
+```text
+1. virtual thread выполняется на carrier
+2. вызывает блокирующее чтение из сети
+3. JVM сохраняет состояние virtual thread
+4. virtual thread освобождает carrier
+5. carrier выполняет другой virtual thread
+6. данные приходят
+7. первый virtual thread снова назначается на carrier
+8. выполнение продолжается со следующей строки
+```
+
+Код выглядит обычным и последовательным:
+
+```java
+String body = httpClient.send(request, BodyHandlers.ofString()).body();
+save(body);
+```
+
+Разработчику не нужно вручную превращать каждое ожидание в цепочку callbacks (обратных вызовов).
+
+## Как создать virtual thread
+
+### Самый короткий способ
+
+```java
+Thread thread = Thread.startVirtualThread(() -> {
+    downloadFile();
+});
+
+thread.join();
+```
+
+`startVirtualThread()` создаёт и сразу запускает новый virtual thread.
+
+### Через Thread.Builder
+
+```java
+Thread thread = Thread.ofVirtual()
+    .name("download-book")
+    .start(() -> downloadFile());
+```
+
+Builder (строитель) удобен, когда нужно задать имя или создать `ThreadFactory`.
+
+### Через ExecutorService
+
+```java
+try (ExecutorService executor =
+         Executors.newVirtualThreadPerTaskExecutor()) {
+
+    Future<Download> future =
+        executor.submit(() -> download(url));
+
+    Download result = future.get();
+}
+```
+
+`newVirtualThreadPerTaskExecutor()` переводится буквально как «executor: новый virtual thread для каждой задачи».
+
+Несмотря на класс `Executors`, этот метод **не создаёт пул virtual threads**:
+
+```text
+task 1 → новый virtual thread 1
+task 2 → новый virtual thread 2
+task 3 → новый virtual thread 3
+```
+
+Закрытие executor ожидает завершения отправленных задач. `Future` по-прежнему используется для результата, ожидания и отмены.
+
+## Почему virtual threads нельзя объединять в пул
+
+Platform threads объединяют в пул, потому что они дороги и их число нужно ограничивать.
+
+Virtual threads дешёвы и предназначены для модели **thread-per-task (поток на задачу)**:
+
+```text
+platform threads
+    дорогой ресурс → переиспользуем через pool
+
+virtual threads
+    дешёвое представление задачи → создаём новый для каждой задачи
+```
+
+Пул из 100 virtual threads искусственно разрешит только 100 одновременных ожиданий и уничтожит главное преимущество технологии.
+
+Если нужно ограничить настоящий дефицитный ресурс — например, десять соединений с базой или пять запросов к внешнему API, — ограничивают именно его:
+
+```java
+Semaphore permits = new Semaphore(5);
+
+permits.acquire();
+try {
+    callExternalService();
+} finally {
+    permits.release();
+}
+```
+
+> Не ограничивай virtual threads ради ограничения другого ресурса. Используй `Semaphore`, connection pool или rate limiter для самого ресурса.
+
+## Для каких задач они подходят
+
+Virtual threads особенно полезны, когда одновременно выполняется много независимых задач, которые большую часть времени ждут:
+
+- HTTP-запросы;
+- JDBC и базы данных;
+- чтение и запись файлов;
+- сетевые сокеты;
+- обработка большого числа клиентских запросов;
+- fan-out — параллельные запросы к нескольким сервисам.
+
+Пример fan-out (разветвления запросов):
+
+```java
+try (ExecutorService executor =
+         Executors.newVirtualThreadPerTaskExecutor()) {
+
+    Future<User> user = executor.submit(() -> loadUser(id));
+    Future<List<Order>> orders = executor.submit(() -> loadOrders(id));
+
+    return new Profile(user.get(), orders.get());
+}
+```
+
+Обе операции могут ждать I/O одновременно, при этом код остаётся обычным последовательным Java-кодом.
+
+## Для каких задач они не дают ускорения
+
+Virtual threads не делают вычисления быстрее и не добавляют процессорных ядер.
+
+```text
+1000 CPU-bound virtual threads
+        ↓
+всё равно делят доступные CPU cores
+```
+
+Для длительных CPU-bound tasks (задач, ограниченных процессором) полезный параллелизм обычно близок к числу доступных ядер. Здесь подходят ограниченный pool, Fork/Join или другие инструменты параллельных вычислений.
+
+Oracle формулирует различие так: virtual threads дают **scale (масштабируемость и throughput)**, а не **speed (ускорение и уменьшение latency)**.
+
+- throughput (пропускная способность) — сколько задач система завершает за единицу времени;
+- latency (задержка) — сколько времени занимает одна задача.
+
+Virtual threads могут повысить throughput системы с множеством ожиданий, но один HTTP-запрос сам по себе не станет быстрее.
+
+## Блокировка и pinning
+
+**Pinning (закрепление)** означает, что заблокированный virtual thread не может временно освободить carrier. Тогда вместе с virtual thread простаивает и дорогой platform thread.
+
+Поведение зависит от версии JDK:
+
+- в JDK 21–23 длительная блокировка внутри `synchronized` могла закреплять carrier;
+- начиная с JDK 24, [JEP 491](https://openjdk.org/jeps/491) устранил pinning при обычной работе с `synchronized` и мониторами;
+- некоторые взаимодействия с native code и Foreign Function & Memory API всё ещё могут закреплять carrier.
+
+Pinning не обязательно нарушает корректность, но длительное и массовое закрепление может уменьшить масштабируемость.
+
+## ThreadLocal и большое число потоков
+
+Virtual threads поддерживают `ThreadLocal`, но значение хранится отдельно для каждого потока. Если создать миллион virtual threads и положить в каждый большой объект, экономия памяти исчезнет.
+
+```java
+ThreadLocal<byte[]> buffer =
+    ThreadLocal.withInitial(() -> new byte[1_000_000]);
+```
+
+Такой код потенциально выделяет большой буфер для каждого virtual thread. Не используй `ThreadLocal` как безразмерный кеш, если приложение создаёт огромное число виртуальных потоков.
+
+## Отмена и interruption
+
+Virtual thread остаётся обычным `Thread` по контракту Java. Для cooperative cancellation (совместной отмены) используется interruption:
+
+```java
+Future<?> future = executor.submit(this::downloadFile);
+future.cancel(true);
+```
+
+Блокирующая операция может завершиться `InterruptedException`. Не проглатывай прерывание:
+
+```java
+try {
+    queue.take();
+} catch (InterruptedException exception) {
+    Thread.currentThread().interrupt();
+    return;
+}
+```
+
+## Как принять решение
+
+```text
+много одновременных задач?
+        │
+        ├── нет → обычный подход достаточен
+        │
+        └── да
+             │
+             ├── задачи в основном ждут I/O
+             │       → virtual thread per task
+             │
+             └── задачи долго считают на CPU
+                     → ограниченный platform-thread pool
+```
+
+Проверочные вопросы:
+
+1. Задачи большую часть времени считают или ждут?
+2. Нужно уменьшить latency одной задачи или увеличить общий throughput?
+3. Ограничиваем ли мы потоки вместо настоящего дефицитного ресурса?
+4. Корректно ли код обрабатывает interruption?
+5. Не хранит ли каждый virtual thread слишком много данных в `ThreadLocal`?
+6. Какая версия JDK используется и актуальны ли для неё ограничения pinning?
+
+> **Главная мысль:** virtual thread — дешёвое представление одной ожидающей задачи. Создавай новый virtual thread для каждой I/O-bound задачи, не объединяй их в пул и отдельно ограничивай реальные дефицитные ресурсы.
+
+## Первоисточники
+
+- [JEP 444: Virtual Threads](https://openjdk.org/jeps/444)
+- [Oracle: Virtual Threads in Java 21](https://docs.oracle.com/en/java/javase/21/core/virtual-threads.html)
+- [JEP 491: Synchronize Virtual Threads without Pinning](https://openjdk.org/jeps/491)
+
+## Дальше
+
+Теперь соберём правила, по которым можно разбирать многопоточный код независимо от типа используемых потоков.
+
+---
+
+← [Executor: задача отдельно от потока](./18-executor.md) · [Как рассуждать о многопоточном коде](./19-reasoning-about-concurrency.md) →

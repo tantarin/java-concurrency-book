@@ -2,7 +2,7 @@
 
 > Пакет, история появления и пулы потоков
 
-← [Атомарные compute и merge](./17-compute-and-merge.md) · [Как рассуждать о многопоточном коде](./19-reasoning-about-concurrency.md) →
+← [Атомарные compute и merge](./17-compute-and-merge.md) · [Виртуальные потоки в Java](./18-virtual-threads.md) →
 
 ## В каком пакете находится Executor
 
@@ -470,8 +470,8 @@ if (!executor.awaitTermination(5, TimeUnit.SECONDS)) {
 
 ## Дальше
 
-Теперь соберём правила, по которым можно разбирать любой многопоточный код.
+С обычными пулами разобрались. Теперь посмотрим на virtual threads, где дешёвый поток создаётся для каждой задачи и объединять такие потоки в пул не нужно.
 
 ---
 
-← [Атомарные compute и merge](./17-compute-and-merge.md) · [Как рассуждать о многопоточном коде](./19-reasoning-about-concurrency.md) →
+← [Атомарные compute и merge](./17-compute-and-merge.md) · [Виртуальные потоки в Java](./18-virtual-threads.md) →
