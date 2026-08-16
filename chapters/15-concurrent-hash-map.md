@@ -19,7 +19,9 @@ Map<String, Integer> views =
 
 ## В живом проекте
 
-- [Реестр загрузок и задач](https://github.com/tantarin/java-concurrency-lab/blob/11c72fc3beda43fd3e744c2eedbf6e60bc93a9f6/downloader/src/main/java/io/github/tantarin/downloader/DownloadManager.java#L15-L21)
+- [Почему для реестра выбран `ConcurrentHashMap`](https://github.com/tantarin/java-concurrency-examples/tree/3310155b8eedbdc69e8b78c03efd2bc8bfb37d2f/collections/concurrent-hash-map-download-registry)
+- [Конкретная реализация реестра](https://github.com/tantarin/java-concurrency-examples/blob/3310155b8eedbdc69e8b78c03efd2bc8bfb37d2f/collections/concurrent-hash-map-download-registry/src/main/java/io/github/tantarin/concurrency/downloads/DownloadRegistry.java#L8-L20)
+- [Конкурентный тест `computeIfAbsent()`](https://github.com/tantarin/java-concurrency-examples/blob/3310155b8eedbdc69e8b78c03efd2bc8bfb37d2f/collections/concurrent-hash-map-download-registry/src/test/java/io/github/tantarin/concurrency/downloads/DownloadRegistryTest.java#L19-L52)
 
 ## Дальше
 

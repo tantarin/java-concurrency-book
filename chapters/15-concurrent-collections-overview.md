@@ -35,6 +35,23 @@ Download current = downloads.get(id);
 downloads.computeIfAbsent(id, this::loadDownload);
 ```
 
+Почему эта коллекция подходит реестру загрузок:
+
+```text
+нужно находить загрузку по id      → Map
+обращаются несколько потоков       → concurrent collection
+сортировка ключей не нужна         → hash map
+нельзя запускать один id дважды    → computeIfAbsent
+```
+
+В отдельном учебном подпроекте это решение можно посмотреть целиком:
+
+- [задача, альтернативы и критерии выбора](https://github.com/tantarin/java-concurrency-examples/tree/3310155b8eedbdc69e8b78c03efd2bc8bfb37d2f/collections/concurrent-hash-map-download-registry);
+- [реестр на `ConcurrentHashMap`](https://github.com/tantarin/java-concurrency-examples/blob/3310155b8eedbdc69e8b78c03efd2bc8bfb37d2f/collections/concurrent-hash-map-download-registry/src/main/java/io/github/tantarin/concurrency/downloads/DownloadRegistry.java#L8-L20);
+- [тест: 32 потока одновременно запрашивают один ключ](https://github.com/tantarin/java-concurrency-examples/blob/3310155b8eedbdc69e8b78c03efd2bc8bfb37d2f/collections/concurrent-hash-map-download-registry/src/test/java/io/github/tantarin/concurrency/downloads/DownloadRegistryTest.java#L19-L52).
+
+Тест проверяет не просто отсутствие исключений. Он доказывает требуемое бизнес-поведение: функция запуска вызывается один раз, а все потоки получают один экземпляр `Download`.
+
 Она не разрешает `null` в качестве ключа или значения. Это позволяет однозначно понимать результат `get() == null`: такого ключа сейчас нет.
 
 Для сортировки по ключам существует `ConcurrentSkipListMap`. Она обычно дороже hash map, зато поддерживает `firstKey()`, `lastKey()`, `subMap()` и другие операции над диапазонами.
