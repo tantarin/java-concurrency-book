@@ -2,7 +2,7 @@
 
 > Mutual exclusion
 
-← [Как теряется инкремент](./05-race-condition.md) · [synchronized и монитор](./07-synchronized.md) →
+← [Подробнее о race condition](./05-race-condition-details.md) · [synchronized и монитор](./07-synchronized.md) →
 
 **Mutex** — сокращение от mutual exclusion, «взаимное исключение». Он не позволяет двум потокам одновременно выполнять защищённый участок кода.
 
@@ -26,4 +26,4 @@ Thread 2 → взял ключ → меняет count
 
 ---
 
-← [Как теряется инкремент](./05-race-condition.md) · [synchronized и монитор](./07-synchronized.md) →
+← [Подробнее о race condition](./05-race-condition-details.md) · [synchronized и монитор](./07-synchronized.md) →
