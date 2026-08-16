@@ -8,6 +8,14 @@
 
 `Collections.synchronizedMap()` создаёт потокобезопасную обёртку над `Map`. Все операции через эту обёртку используют один общий lock: пока один поток работает с map, остальные ждут освобождения lock.
 
+## Когда появился и устарел ли
+
+`Collections.synchronizedMap()` появился в JDK 1.2 в 1998 году вместе с Java Collections Framework. Это старый API, но не deprecated (не объявленный устаревшим): он по-прежнему входит в современную Java и имеет подходящие сценарии применения.
+
+В Java 5 в составе JSR 166 появились `ConcurrentMap` и `ConcurrentHashMap`. Для общей изменяемой map, к которой часто обращаются несколько потоков, `ConcurrentHashMap` обычно служит современным выбором по умолчанию: она лучше поддерживает параллельный доступ и предоставляет атомарные операции для отдельного ключа.
+
+Это не означает, что `synchronizedMap` нужно всегда заменять. Она остаётся полезна, когда нужен один общий lock, согласованная операция над всей map или синхронизированная обёртка над конкретной реализацией — например, `LinkedHashMap`. Поэтому выбирать следует не по возрасту API, а по требуемому контракту и характеру нагрузки.
+
 ## Задача перед теорией: небольшой реестр настроек
 
 Представь внутренний инструмент, где несколько потоков читают и изредка меняют небольшой набор runtime-настроек:
@@ -329,6 +337,7 @@ Map после создания не меняется?
 
 - [Java API: `Collections.synchronizedMap()`](https://docs.oracle.com/javase/8/docs/api/java/util/Collections.html#synchronizedMap-java.util.Map-)
 - [Java API: `ConcurrentHashMap`](https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ConcurrentHashMap.html)
+- [JSR 166: Concurrency Utilities](https://jcp.org/aboutJava/communityprocess/final/jsr166/index.html)
 - [Java API: `BlockingQueue`](https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/BlockingQueue.html)
 
 ## Дальше
