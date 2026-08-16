@@ -2,7 +2,7 @@
 
 > Правильное обновление
 
-← [Почему get и put недостаточно](./16-operation-composition.md) · [Runnable vs. Callable](./18-runnable-vs-callable.md) →
+← [Почему get и put недостаточно](./16-operation-composition.md) · [Границы computeIfAbsent](./17-compute-if-absent-safety.md) →
 
 `compute` позволяет описать изменение значения одного ключа как атомарную операцию:
 
@@ -25,8 +25,8 @@ views.merge("car:123", 1, Integer::sum);
 
 ## Дальше
 
-Теперь передадим реальные задачи ограниченному пулу потоков и разберём Executor.
+Атомарный метод map закрывает промежуток между чтением и записью одного ключа. Но делает ли он потокобезопасным объект, сохранённый как значение? Следующая глава проведёт точную границу гарантии `computeIfAbsent()`.
 
 ---
 
-← [Почему get и put недостаточно](./16-operation-composition.md) · [Runnable vs. Callable](./18-runnable-vs-callable.md) →
+← [Почему get и put недостаточно](./16-operation-composition.md) · [Границы computeIfAbsent](./17-compute-if-absent-safety.md) →

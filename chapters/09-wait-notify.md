@@ -2,7 +2,7 @@
 
 > Как потоки координируются через монитор объекта
 
-← [Где прячется lock у метода](./09-synchronized-method.md) · [Deadlock vs. livelock](./09-deadlock-vs-livelock.md) →
+← [Где прячется lock у метода](./09-synchronized-method.md) · [synchronized vs. ReentrantLock](./09-synchronized-vs-reentrant-lock.md) →
 
 ## Задача перед теорией: ограниченный буфер
 
@@ -286,8 +286,8 @@ E take() throws InterruptedException
 
 ## Дальше
 
-Мы увидели, как потоки ждут изменения условий. Теперь разберём две ситуации, когда ожидание или повторные попытки не приводят к полезному прогрессу: deadlock и livelock.
+Мы увидели встроенный monitor API с одним wait set. Теперь сравним его с явным `ReentrantLock`, который поддерживает таймауты, прерываемое получение и несколько `Condition`.
 
 ---
 
-← [Где прячется lock у метода](./09-synchronized-method.md) · [Deadlock vs. livelock](./09-deadlock-vs-livelock.md) →
+← [Где прячется lock у метода](./09-synchronized-method.md) · [synchronized vs. ReentrantLock](./09-synchronized-vs-reentrant-lock.md) →

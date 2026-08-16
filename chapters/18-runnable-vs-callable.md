@@ -2,7 +2,7 @@
 
 > Действие без результата или вычисление с результатом и ошибкой
 
-← [Атомарные compute и merge](./17-compute-and-merge.md) · [Executor](./18-executor.md) →
+← [Границы computeIfAbsent](./17-compute-if-absent-safety.md) · [Executor](./18-executor.md) →
 
 ## Задача перед теорией: узнать размер файла
 
@@ -194,4 +194,4 @@ Runnable ── execute() ─→ результата нет
 
 ---
 
-← [Атомарные compute и merge](./17-compute-and-merge.md) · [Executor](./18-executor.md) →
+← [Границы computeIfAbsent](./17-compute-if-absent-safety.md) · [Executor](./18-executor.md) →

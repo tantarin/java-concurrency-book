@@ -2,7 +2,7 @@
 
 > Потоки заблокированы или активно мешают друг другу
 
-← [wait(), notify() и notifyAll()](./09-wait-notify.md) · [Почему изменения нужно «увидеть»](./10-visibility.md) →
+← [synchronized vs. ReentrantLock](./09-synchronized-vs-reentrant-lock.md) · [Почему изменения нужно «увидеть»](./10-visibility.md) →
 
 ## Задача перед теорией: два встречных перевода
 
@@ -260,4 +260,4 @@ Deadlock-демонстрация создаёт daemon threads (фоновые 
 
 ---
 
-← [wait(), notify() и notifyAll()](./09-wait-notify.md) · [Почему изменения нужно «увидеть»](./10-visibility.md) →
+← [synchronized vs. ReentrantLock](./09-synchronized-vs-reentrant-lock.md) · [Почему изменения нужно «увидеть»](./10-visibility.md) →
