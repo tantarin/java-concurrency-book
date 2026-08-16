@@ -4,6 +4,8 @@
 
 Текст хранится в обычных Markdown-файлах. Главы можно читать прямо на GitHub, обсуждать через Issues и улучшать небольшими pull request.
 
+При первом появлении английского понятия рядом указан русский перевод. Все переводы собраны в [словаре терминов](./GLOSSARY.md).
+
 ## Оглавление
 
 1. [С чего начинается Java](./chapters/01-java-and-specification.md) — Язык и спецификация
@@ -11,13 +13,13 @@
 3. [Что такое поток](./chapters/03-what-is-thread.md) — Process, stack и heap
 4. [Где JVM хранит данные: stack, heap и не только](./chapters/03-java-memory.md) — Области памяти Java-процесса
 5. [Наш сервис просмотров](./chapters/04-shared-mutable-state.md) — Общее изменяемое состояние
-6. [Как теряется инкремент](./chapters/05-race-condition.md) — Race condition и atomicity
-7. [Race condition: когда результат зависит от порядка потоков](./chapters/05-race-condition-details.md) — Гонки, data race и способы исправления
+6. [Как теряется инкремент](./chapters/05-race-condition.md) — Состояние гонки и атомарность
+7. [Race condition: когда результат зависит от порядка потоков](./chapters/05-race-condition-details.md) — Состояние гонки, гонка данных и способы исправления
 8. [Mutex: один ключ от комнаты](./chapters/06-mutex.md) — Mutual exclusion
 9. [synchronized и монитор](./chapters/07-synchronized.md) — Первое исправление
 10. [Почему lock — объект](./chapters/08-object-as-lock.md) — Identity и разные замки
 11. [Где прячется lock у метода](./chapters/09-synchronized-method.md) — this и MyClass.class
-12. [Почему изменения нужно «увидеть»](./chapters/10-visibility.md) — Visibility
+12. [Почему изменения нужно «увидеть»](./chapters/10-visibility.md) — Видимость изменений
 13. [Зачем придумали Java Memory Model](./chapters/11-java-memory-model.md) — JMM
 14. [Happens-before простыми словами](./chapters/12-happens-before.md) — JLS 17.4.5
 15. [Когда одного счётчика мало](./chapters/13-shared-map.md) — Переходим к Map
