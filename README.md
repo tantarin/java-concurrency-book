@@ -28,9 +28,11 @@
 18. [Зачем ConcurrentHashMap](./chapters/15-concurrent-hash-map.md) — Конкурентная коллекция
 19. [Почему get и put недостаточно](./chapters/16-operation-composition.md) — Композиция операций
 20. [Атомарные compute и merge](./chapters/17-compute-and-merge.md) — Правильное обновление
-21. [Executor: задача отдельно от потока](./chapters/18-executor.md) — Пулы потоков
-22. [Виртуальные потоки в Java](./chapters/18-virtual-threads.md) — Virtual threads, carrier threads и блокирующий I/O
-23. [Как рассуждать о многопоточном коде](./chapters/19-reasoning-about-concurrency.md) — Итог маршрута
+21. [Runnable vs. Callable: два контракта задачи](./chapters/18-runnable-vs-callable.md) — Результат, исключения и Future
+22. [Executor: задача отдельно от потока](./chapters/18-executor.md) — Пулы потоков
+23. [Fork/Join: разделяем вычисление на подзадачи](./chapters/18-fork-join.md) — RecursiveTask и work stealing
+24. [Виртуальные потоки в Java](./chapters/18-virtual-threads.md) — Virtual threads, carrier threads и блокирующий I/O
+25. [Как рассуждать о многопоточном коде](./chapters/19-reasoning-about-concurrency.md) — Итог маршрута
 
 ## Сквозной проект
 

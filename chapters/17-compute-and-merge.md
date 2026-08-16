@@ -2,7 +2,7 @@
 
 > Правильное обновление
 
-← [Почему get и put недостаточно](./16-operation-composition.md) · [Executor: задача отдельно от потока](./18-executor.md) →
+← [Почему get и put недостаточно](./16-operation-composition.md) · [Runnable vs. Callable](./18-runnable-vs-callable.md) →
 
 `compute` позволяет описать изменение значения одного ключа как атомарную операцию:
 
@@ -29,4 +29,4 @@ views.merge("car:123", 1, Integer::sum);
 
 ---
 
-← [Почему get и put недостаточно](./16-operation-composition.md) · [Executor: задача отдельно от потока](./18-executor.md) →
+← [Почему get и put недостаточно](./16-operation-composition.md) · [Runnable vs. Callable](./18-runnable-vs-callable.md) →

@@ -2,7 +2,7 @@
 
 > Пакет, история появления и пулы потоков
 
-← [Атомарные compute и merge](./17-compute-and-merge.md) · [Виртуальные потоки в Java](./18-virtual-threads.md) →
+← [Runnable vs. Callable](./18-runnable-vs-callable.md) · [Fork/Join](./18-fork-join.md) →
 
 ## В каком пакете находится Executor
 
@@ -470,8 +470,8 @@ if (!executor.awaitTermination(5, TimeUnit.SECONDS)) {
 
 ## Дальше
 
-С обычными пулами разобрались. Теперь посмотрим на virtual threads, где дешёвый поток создаётся для каждой задачи и объединять такие потоки в пул не нужно.
+С обычными пулами для независимых задач разобрались. Теперь посмотрим на `ForkJoinPool`, который предназначен для CPU-bound вычислений, рекурсивно порождающих подзадачи.
 
 ---
 
-← [Атомарные compute и merge](./17-compute-and-merge.md) · [Виртуальные потоки в Java](./18-virtual-threads.md) →
+← [Runnable vs. Callable](./18-runnable-vs-callable.md) · [Fork/Join](./18-fork-join.md) →
