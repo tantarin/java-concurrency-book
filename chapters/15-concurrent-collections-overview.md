@@ -2,7 +2,7 @@
 
 > Map, queue, deque, set и copy-on-write
 
-← [synchronizedMap: безопасная очередь](./14-synchronized-map.md) · [Зачем ConcurrentHashMap](./15-concurrent-hash-map.md) →
+← [synchronizedMap: один общий lock](./14-synchronized-map.md) · [Зачем ConcurrentHashMap](./15-concurrent-hash-map.md) →
 
 Обычные `ArrayList`, `HashMap` и `ArrayDeque` не предназначены для конкурентного изменения. Если несколько потоков работают с одной коллекцией, недостаточно выбрать любой класс со словом `Concurrent` в названии: разные коллекции решают разные задачи.
 
@@ -187,4 +187,4 @@ synchronized (values) {
 
 ---
 
-← [synchronizedMap: безопасная очередь](./14-synchronized-map.md) · [Зачем ConcurrentHashMap](./15-concurrent-hash-map.md) →
+← [synchronizedMap: один общий lock](./14-synchronized-map.md) · [Зачем ConcurrentHashMap](./15-concurrent-hash-map.md) →

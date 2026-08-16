@@ -26,7 +26,7 @@
 16. [Зачем придумали Java Memory Model](./chapters/11-java-memory-model.md) — JMM
 17. [Happens-before простыми словами](./chapters/12-happens-before.md) — JLS 17.4.5
 18. [Когда одного счётчика мало](./chapters/13-shared-map.md) — Переходим к Map
-19. [synchronizedMap: безопасная очередь](./chapters/14-synchronized-map.md) — Один общий lock
+19. [synchronizedMap: Map с одним общим lock](./chapters/14-synchronized-map.md) — Когда выбирать синхронизированную обёртку
 20. [Какие конкурентные коллекции есть в Java](./chapters/15-concurrent-collections-overview.md) — Map, queue, deque, set и copy-on-write
 21. [Зачем ConcurrentHashMap](./chapters/15-concurrent-hash-map.md) — Конкурентная коллекция
 22. [Почему get и put недостаточно](./chapters/16-operation-composition.md) — Композиция операций

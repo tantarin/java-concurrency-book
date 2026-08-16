@@ -2,7 +2,7 @@
 
 > Переходим к Map
 
-← [Happens-before простыми словами](./12-happens-before.md) · [synchronizedMap: безопасная очередь](./14-synchronized-map.md) →
+← [Happens-before простыми словами](./12-happens-before.md) · [synchronizedMap: один общий lock](./14-synchronized-map.md) →
 
 Сервис вырос. Теперь нужно знать число просмотров каждого объявления. Естественное решение — хранить значение по идентификатору:
 
@@ -25,4 +25,4 @@ views.put(adId, value + 1);
 
 ---
 
-← [Happens-before простыми словами](./12-happens-before.md) · [synchronizedMap: безопасная очередь](./14-synchronized-map.md) →
+← [Happens-before простыми словами](./12-happens-before.md) · [synchronizedMap: один общий lock](./14-synchronized-map.md) →
