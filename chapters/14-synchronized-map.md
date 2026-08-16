@@ -4,7 +4,7 @@
 
 ← [Когда одного счётчика мало](./13-shared-map.md) · [Какие конкурентные коллекции есть в Java](./15-concurrent-collections-overview.md) →
 
-## Сначала исправим название
+## Что делает synchronizedMap
 
 `Collections.synchronizedMap()` создаёт потокобезопасную обёртку над `Map`. Это не queue (очередь):
 
@@ -13,7 +13,7 @@
 - у неё нет `take()` с ожиданием элемента;
 - она не решает producer–consumer задачу.
 
-Слово «очередь» здесь можно использовать только как метафору: потоки по очереди получают один общий lock. Если нужна настоящая блокирующая очередь, выбирают [`BlockingQueue`](./15-concurrent-collections-overview.md#blockingqueue).
+Все операции обёртки используют один общий lock. Если нужна передача элементов между producer и consumer с ожиданием, выбирают [`BlockingQueue`](./15-concurrent-collections-overview.md#blockingqueue).
 
 ## Задача перед теорией: небольшой реестр настроек
 
