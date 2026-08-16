@@ -9,22 +9,23 @@
 1. [С чего начинается Java](./chapters/01-java-and-specification.md) — Язык и спецификация
 2. [Зачем приложениям несколько потоков](./chapters/02-why-multiple-threads.md) — Практические примеры
 3. [Что такое поток](./chapters/03-what-is-thread.md) — Process, stack и heap
-4. [Наш сервис просмотров](./chapters/04-shared-mutable-state.md) — Общее изменяемое состояние
-5. [Как теряется инкремент](./chapters/05-race-condition.md) — Race condition и atomicity
-6. [Mutex: один ключ от комнаты](./chapters/06-mutex.md) — Mutual exclusion
-7. [synchronized и монитор](./chapters/07-synchronized.md) — Первое исправление
-8. [Почему lock — объект](./chapters/08-object-as-lock.md) — Identity и разные замки
-9. [Где прячется lock у метода](./chapters/09-synchronized-method.md) — this и MyClass.class
-10. [Почему изменения нужно «увидеть»](./chapters/10-visibility.md) — Visibility
-11. [Зачем придумали Java Memory Model](./chapters/11-java-memory-model.md) — JMM
-12. [Happens-before простыми словами](./chapters/12-happens-before.md) — JLS 17.4.5
-13. [Когда одного счётчика мало](./chapters/13-shared-map.md) — Переходим к Map
-14. [synchronizedMap: безопасная очередь](./chapters/14-synchronized-map.md) — Один общий lock
-15. [Зачем ConcurrentHashMap](./chapters/15-concurrent-hash-map.md) — Конкурентная коллекция
-16. [Почему get и put недостаточно](./chapters/16-operation-composition.md) — Композиция операций
-17. [Атомарные compute и merge](./chapters/17-compute-and-merge.md) — Правильное обновление
-18. [Executor: задача отдельно от потока](./chapters/18-executor.md) — Пулы потоков
-19. [Как рассуждать о многопоточном коде](./chapters/19-reasoning-about-concurrency.md) — Итог маршрута
+4. [Где JVM хранит данные: stack, heap и не только](./chapters/03-java-memory.md) — Области памяти Java-процесса
+5. [Наш сервис просмотров](./chapters/04-shared-mutable-state.md) — Общее изменяемое состояние
+6. [Как теряется инкремент](./chapters/05-race-condition.md) — Race condition и atomicity
+7. [Mutex: один ключ от комнаты](./chapters/06-mutex.md) — Mutual exclusion
+8. [synchronized и монитор](./chapters/07-synchronized.md) — Первое исправление
+9. [Почему lock — объект](./chapters/08-object-as-lock.md) — Identity и разные замки
+10. [Где прячется lock у метода](./chapters/09-synchronized-method.md) — this и MyClass.class
+11. [Почему изменения нужно «увидеть»](./chapters/10-visibility.md) — Visibility
+12. [Зачем придумали Java Memory Model](./chapters/11-java-memory-model.md) — JMM
+13. [Happens-before простыми словами](./chapters/12-happens-before.md) — JLS 17.4.5
+14. [Когда одного счётчика мало](./chapters/13-shared-map.md) — Переходим к Map
+15. [synchronizedMap: безопасная очередь](./chapters/14-synchronized-map.md) — Один общий lock
+16. [Зачем ConcurrentHashMap](./chapters/15-concurrent-hash-map.md) — Конкурентная коллекция
+17. [Почему get и put недостаточно](./chapters/16-operation-composition.md) — Композиция операций
+18. [Атомарные compute и merge](./chapters/17-compute-and-merge.md) — Правильное обновление
+19. [Executor: задача отдельно от потока](./chapters/18-executor.md) — Пулы потоков
+20. [Как рассуждать о многопоточном коде](./chapters/19-reasoning-about-concurrency.md) — Итог маршрута
 
 ## Сквозной проект
 
