@@ -2,7 +2,7 @@
 
 > Итог маршрута
 
-← [Виртуальные потоки в Java](./18-virtual-threads.md) · [Оглавление](../README.md) →
+← [Event loop в WebFlux](./18-event-loop-webflux.md) · [Оглавление](../README.md) →
 
 Мы начали со спецификации не случайно. Многопоточность проходит через исходный код, JVM, оптимизации JIT, планировщик и процессор. JMM связывает эти уровни единым набором гарантий.
 
@@ -37,4 +37,4 @@ atomicity + visibility
 
 ---
 
-← [Виртуальные потоки в Java](./18-virtual-threads.md) · [Оглавление](../README.md) →
+← [Event loop в WebFlux](./18-event-loop-webflux.md) · [Оглавление](../README.md) →

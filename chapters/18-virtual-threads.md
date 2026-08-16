@@ -2,7 +2,7 @@
 
 > Virtual threads, carrier threads и блокирующий I/O
 
-← [Fork/Join](./18-fork-join.md) · [Как рассуждать о многопоточном коде](./19-reasoning-about-concurrency.md) →
+← [Fork/Join](./18-fork-join.md) · [Event loop в WebFlux](./18-event-loop-webflux.md) →
 
 ## Задача перед теорией: монитор доступности URL
 
@@ -419,8 +419,8 @@ try {
 
 ## Дальше
 
-Теперь соберём правила, по которым можно разбирать многопоточный код независимо от типа используемых потоков.
+Теперь разберём другую модель обслуживания множества ожидающих I/O-операций: event loop в Spring WebFlux.
 
 ---
 
-← [Fork/Join](./18-fork-join.md) · [Как рассуждать о многопоточном коде](./19-reasoning-about-concurrency.md) →
+← [Fork/Join](./18-fork-join.md) · [Event loop в WebFlux](./18-event-loop-webflux.md) →

@@ -36,7 +36,8 @@
 26. [Executor: задача отдельно от потока](./chapters/18-executor.md) — Пулы потоков
 27. [Fork/Join: разделяем вычисление на подзадачи](./chapters/18-fork-join.md) — RecursiveTask и work stealing
 28. [Виртуальные потоки в Java](./chapters/18-virtual-threads.md) — Virtual threads, carrier threads и блокирующий I/O
-29. [Как рассуждать о многопоточном коде](./chapters/19-reasoning-about-concurrency.md) — Итог маршрута
+29. [Event loop в WebFlux: один диспетчер, много запросов](./chapters/18-event-loop-webflux.md) — Неблокирующий I/O небольшим числом потоков
+30. [Как рассуждать о многопоточном коде](./chapters/19-reasoning-about-concurrency.md) — Итог маршрута
 
 ## Сквозной проект
 
