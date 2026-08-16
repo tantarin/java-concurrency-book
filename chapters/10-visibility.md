@@ -2,7 +2,7 @@
 
 > Visibility
 
-← [wait(), notify() и notifyAll()](./09-wait-notify.md) · [Зачем придумали Java Memory Model](./11-java-memory-model.md) →
+← [Deadlock vs. livelock](./09-deadlock-vs-livelock.md) · [Зачем придумали Java Memory Model](./11-java-memory-model.md) →
 
 До сих пор речь шла об **atomicity (атомарности)**: действия не должны вклиниваться друг в друга. Но есть отдельная проблема — **visibility (видимость изменений между потоками)**.
 
@@ -28,4 +28,4 @@ Thread 2: какое значение ему разрешено увидеть?
 
 ---
 
-← [wait(), notify() и notifyAll()](./09-wait-notify.md) · [Зачем придумали Java Memory Model](./11-java-memory-model.md) →
+← [Deadlock vs. livelock](./09-deadlock-vs-livelock.md) · [Зачем придумали Java Memory Model](./11-java-memory-model.md) →
