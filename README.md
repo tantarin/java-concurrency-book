@@ -19,20 +19,21 @@
 9. [synchronized и монитор](./chapters/07-synchronized.md) — Первое исправление
 10. [Почему lock — объект](./chapters/08-object-as-lock.md) — Identity и разные замки
 11. [Где прячется lock у метода](./chapters/09-synchronized-method.md) — this и MyClass.class
-12. [Почему изменения нужно «увидеть»](./chapters/10-visibility.md) — Видимость изменений
-13. [Зачем придумали Java Memory Model](./chapters/11-java-memory-model.md) — JMM
-14. [Happens-before простыми словами](./chapters/12-happens-before.md) — JLS 17.4.5
-15. [Когда одного счётчика мало](./chapters/13-shared-map.md) — Переходим к Map
-16. [synchronizedMap: безопасная очередь](./chapters/14-synchronized-map.md) — Один общий lock
-17. [Какие конкурентные коллекции есть в Java](./chapters/15-concurrent-collections-overview.md) — Map, queue, deque, set и copy-on-write
-18. [Зачем ConcurrentHashMap](./chapters/15-concurrent-hash-map.md) — Конкурентная коллекция
-19. [Почему get и put недостаточно](./chapters/16-operation-composition.md) — Композиция операций
-20. [Атомарные compute и merge](./chapters/17-compute-and-merge.md) — Правильное обновление
-21. [Runnable vs. Callable: два контракта задачи](./chapters/18-runnable-vs-callable.md) — Результат, исключения и Future
-22. [Executor: задача отдельно от потока](./chapters/18-executor.md) — Пулы потоков
-23. [Fork/Join: разделяем вычисление на подзадачи](./chapters/18-fork-join.md) — RecursiveTask и work stealing
-24. [Виртуальные потоки в Java](./chapters/18-virtual-threads.md) — Virtual threads, carrier threads и блокирующий I/O
-25. [Как рассуждать о многопоточном коде](./chapters/19-reasoning-about-concurrency.md) — Итог маршрута
+12. [wait(), notify() и notifyAll(): ожидание условия](./chapters/09-wait-notify.md) — Координация через монитор
+13. [Почему изменения нужно «увидеть»](./chapters/10-visibility.md) — Видимость изменений
+14. [Зачем придумали Java Memory Model](./chapters/11-java-memory-model.md) — JMM
+15. [Happens-before простыми словами](./chapters/12-happens-before.md) — JLS 17.4.5
+16. [Когда одного счётчика мало](./chapters/13-shared-map.md) — Переходим к Map
+17. [synchronizedMap: безопасная очередь](./chapters/14-synchronized-map.md) — Один общий lock
+18. [Какие конкурентные коллекции есть в Java](./chapters/15-concurrent-collections-overview.md) — Map, queue, deque, set и copy-on-write
+19. [Зачем ConcurrentHashMap](./chapters/15-concurrent-hash-map.md) — Конкурентная коллекция
+20. [Почему get и put недостаточно](./chapters/16-operation-composition.md) — Композиция операций
+21. [Атомарные compute и merge](./chapters/17-compute-and-merge.md) — Правильное обновление
+22. [Runnable vs. Callable: два контракта задачи](./chapters/18-runnable-vs-callable.md) — Результат, исключения и Future
+23. [Executor: задача отдельно от потока](./chapters/18-executor.md) — Пулы потоков
+24. [Fork/Join: разделяем вычисление на подзадачи](./chapters/18-fork-join.md) — RecursiveTask и work stealing
+25. [Виртуальные потоки в Java](./chapters/18-virtual-threads.md) — Virtual threads, carrier threads и блокирующий I/O
+26. [Как рассуждать о многопоточном коде](./chapters/19-reasoning-about-concurrency.md) — Итог маршрута
 
 ## Сквозной проект
 
