@@ -13,6 +13,8 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 ```
 
 Название пакета можно прочитать как «утилиты для конкурентного программирования»:
@@ -119,13 +121,147 @@ Executors
 
 ### Executors
 
-`Executors` — не executor и не интерфейс. Это utility class (служебный класс) со статическими фабричными методами:
+`Executors` — не executor и не интерфейс. Это utility class (служебный класс) со **static factory methods (статическими фабричными методами)**.
+
+Factory method (фабричный метод) создаёт и настраивает объект за нас. Поэтому мы вызываем метод через имя класса и не пишем конструктор конкретной реализации:
 
 ```java
-Executors.newFixedThreadPool(4);
-Executors.newSingleThreadExecutor();
-Executors.newScheduledThreadPool(2);
+ExecutorService pool =
+    Executors.newFixedThreadPool(4);
 ```
+
+Слово `new` в имени метода означает «создай настроенный executor», но это обычный статический метод, а не оператор `new` языка Java.
+
+Три приведённых метода создают пулы с разной политикой:
+
+| Метод | Сколько worker-потоков | Что происходит с лишними задачами | Когда подходит |
+|---|---:|---|---|
+| `newFixedThreadPool(n)` | ровно `n` активных workers | ждут в общей очереди | ограниченное параллельное выполнение |
+| `newSingleThreadExecutor()` | один worker | ждут в очереди и выполняются последовательно | когда важен порядок задач |
+| `newScheduledThreadPool(n)` | до `n` workers для наступивших задач | ждут назначенного времени | задержанные и периодические задачи |
+
+#### newFixedThreadPool(n): фиксированный пул
+
+```java
+ExecutorService pool =
+    Executors.newFixedThreadPool(4);
+```
+
+Параметр `4` задаёт число worker threads (рабочих потоков). Одновременно могут выполняться не более четырёх задач:
+
+```text
+task 1 → worker 1
+task 2 → worker 2
+task 3 → worker 3
+task 4 → worker 4
+task 5 → очередь
+task 6 → очередь
+```
+
+Когда worker завершает задачу, он берёт следующую из очереди. Потоки переиспользуются: для каждой задачи новый `Thread` не создаётся.
+
+Подходит для менеджера загрузок, если мы хотим разрешить, например, только четыре одновременных скачивания.
+
+Важное ограничение: фабрика использует очередь без фиксированной ёмкости. Число потоков ограничено, но при слишком быстром поступлении задач очередь может расти и расходовать память.
+
+#### newSingleThreadExecutor(): один последовательный worker
+
+```java
+ExecutorService executor =
+    Executors.newSingleThreadExecutor();
+```
+
+Все задачи выполняет один worker в порядке поступления:
+
+```text
+очередь: task 1 → task 2 → task 3
+
+worker выполняет:
+task 1
+затем task 2
+затем task 3
+```
+
+Одновременно две задачи из этого executor не выполняются. Это полезно, когда:
+
+- изменения должны применяться последовательно;
+- требуется сохранить порядок событий;
+- один выделенный поток владеет изменяемым состоянием;
+- фоновая работа не должна выполняться параллельно.
+
+Это не «пул для ускорения»: один worker не даёт параллельного выполнения. Его смысл — последовательность и изоляция. Очередь здесь также не имеет фиксированной ёмкости.
+
+#### newScheduledThreadPool(n): выполнение по времени
+
+```java
+ScheduledExecutorService scheduler =
+    Executors.newScheduledThreadPool(2);
+```
+
+Этот метод возвращает `ScheduledExecutorService` (планируемый сервис выполнения). Он нужен не просто для немедленной отправки задач, а для работы со временем.
+
+Запустить один раз через пять секунд:
+
+```java
+scheduler.schedule(
+    this::retryDownload,
+    5,
+    TimeUnit.SECONDS
+);
+```
+
+Запускать по фиксированному расписанию — каждые десять секунд от планового времени старта:
+
+```java
+scheduler.scheduleAtFixedRate(
+    this::printStatistics,
+    0,
+    10,
+    TimeUnit.SECONDS
+);
+```
+
+Ждать десять секунд после завершения предыдущего запуска:
+
+```java
+scheduler.scheduleWithFixedDelay(
+    this::checkForUpdates,
+    0,
+    10,
+    TimeUnit.SECONDS
+);
+```
+
+Различие двух периодических методов:
+
+```text
+scheduleAtFixedRate
+start ── 10 sec ── start ── 10 sec ── start
+
+scheduleWithFixedDelay
+start → finish ── 10 sec ── start → finish ── 10 sec
+```
+
+Если выполнение `scheduleAtFixedRate()` длится дольше заданного периода, следующий запуск опоздает, но два запуска одной периодической задачи не будут выполняться одновременно.
+
+Параметр `2` означает, что две готовые к запуску задачи могут выполняться одновременно. Он не означает «выполнить задачу два раза».
+
+Такой scheduler подходит для retry (повторной попытки), периодического сохранения прогресса, обновления статистики и обслуживания кеша.
+
+#### Как выбрать
+
+```text
+нужно выполнять до N задач одновременно
+    → newFixedThreadPool(N)
+
+нужно выполнять задачи строго по одной
+    → newSingleThreadExecutor()
+
+нужен запуск позже или периодически
+    → newScheduledThreadPool(N)
+```
+
+Это удобные фабрики для типовых политик. Если нужно явно ограничить очередь, настроить rejection policy (политику отклонения), время жизни потоков или другие детали, создают и конфигурируют `ThreadPoolExecutor` напрямую.
 
 ### ThreadPoolExecutor
 
