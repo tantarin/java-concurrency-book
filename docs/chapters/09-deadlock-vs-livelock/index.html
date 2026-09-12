@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Deadlock vs. livelock: нет прогресса по разным причинам · Многопоточность в Java</title><meta name="description" content="Цикл ожидания и активность без результата">
+<link rel="stylesheet" href="/java-concurrency-book/assets/style.css"><link rel="icon" href="/java-concurrency-book/assets/favicon.svg" type="image/svg+xml">
+</head><body class="reader">
+<div class="reading-progress" id="reading-progress"></div>
+<header class="topbar"><a class="brand" href="/java-concurrency-book/"><span class="brand-mark">//</span><span>Java<br><b>Concurrency</b></span></a><button class="menu-button" id="menu-button" aria-label="Открыть оглавление">Оглавление</button><div class="top-actions"><button id="theme-button" class="icon-button" aria-label="Переключить тему">◐</button><a href="https://github.com/tantarin/java-concurrency-book" target="_blank">GitHub ↗</a></div></header>
+<aside class="sidebar" id="sidebar"><div class="sidebar-head"><p>Учебный маршрут</p><button id="close-menu" aria-label="Закрыть">×</button></div><label class="search"><span>⌕</span><input id="search" type="search" placeholder="Найти тему или главу"></label><nav id="chapter-nav"><a class="chapter-link" href="/java-concurrency-book/chapters/01-java-and-specification/"><span>01</span><div>С чего начинается Java<small>Язык и спецификация</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/02-why-multiple-threads/"><span>02</span><div>Зачем приложениям несколько потоков<small>Практические примеры</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/03-what-is-thread/"><span>03</span><div>Что такое поток<small>Process, stack и heap</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/03-java-memory/"><span>04</span><div>Где JVM хранит данные: stack, heap и не только<small>Области памяти Java-процесса</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/04-shared-mutable-state/"><span>05</span><div>Наш сервис просмотров<small>Общее изменяемое состояние</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/05-race-condition/"><span>06</span><div>Как теряется инкремент<small>Состояние гонки и атомарность</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/05-race-condition-details/"><span>07</span><div>Race condition: когда результат зависит от порядка потоков<small>Состояние гонки, гонка данных и способы исправления</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/06-mutex/"><span>08</span><div>Mutex: один ключ от комнаты<small>Mutual exclusion</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/07-synchronized/"><span>09</span><div>synchronized и монитор<small>Первое исправление</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/08-object-as-lock/"><span>10</span><div>Почему lock — объект<small>Identity и разные замки</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/09-synchronized-method/"><span>11</span><div>Где прячется lock у метода<small>this и MyClass.class</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/09-wait-notify/"><span>12</span><div>wait(), notify() и notifyAll(): ожидание условия<small>Координация через монитор</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/09-synchronized-vs-reentrant-lock/"><span>13</span><div>synchronized vs. ReentrantLock<small>Встроенный monitor и явный lock</small></div></a><a class="chapter-link active" href="/java-concurrency-book/chapters/09-deadlock-vs-livelock/"><span>14</span><div>Deadlock vs. livelock: нет прогресса по разным причинам<small>Цикл ожидания и активность без результата</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/10-visibility/"><span>15</span><div>Почему изменения нужно «увидеть»<small>Видимость изменений</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/11-java-memory-model/"><span>16</span><div>Зачем придумали Java Memory Model<small>JMM</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/12-happens-before/"><span>17</span><div>Happens-before простыми словами<small>JLS 17.4.5</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/13-shared-map/"><span>18</span><div>Когда одного счётчика мало<small>Переходим к Map</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/14-synchronized-map/"><span>19</span><div>synchronizedMap: Map с одним общим lock<small>Когда выбирать синхронизированную обёртку</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/15-concurrent-collections-overview/"><span>20</span><div>Какие конкурентные коллекции есть в Java<small>Map, queue, deque, set и copy-on-write</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/15-concurrent-hash-map/"><span>21</span><div>Зачем ConcurrentHashMap<small>Конкурентная коллекция</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/16-operation-composition/"><span>22</span><div>Почему get и put недостаточно<small>Композиция операций</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/17-compute-and-merge/"><span>23</span><div>Атомарные compute и merge<small>Правильное обновление</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/17-compute-if-absent-safety/"><span>24</span><div>Границы потокобезопасности computeIfAbsent<small>Атомарная Map и изменяемое value</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/18-runnable-vs-callable/"><span>25</span><div>Runnable vs. Callable: два контракта задачи<small>Результат, исключения и Future</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/18-executor/"><span>26</span><div>Executor: задача отдельно от потока<small>Пулы потоков</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/18-fork-join/"><span>27</span><div>Fork/Join: разделяем вычисление на подзадачи<small>RecursiveTask и work stealing</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/18-virtual-threads/"><span>28</span><div>Виртуальные потоки в Java<small>Virtual threads, carrier threads и блокирующий I/O</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/18-event-loop-webflux/"><span>29</span><div>Event loop в WebFlux: один диспетчер, много запросов<small>Неблокирующий I/O небольшим числом потоков</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/19-reasoning-about-concurrency/"><span>30</span><div>Как рассуждать о многопоточном коде<small>Итог маршрута</small></div></a></nav><a class="glossary-link" href="/java-concurrency-book/glossary/">Aa&nbsp;&nbsp;Словарь терминов</a></aside>
+<main class="main reader"><article><div class="chapter-meta"><span>Глава 14 из 30</span><span>7 мин чтения</span></div><h1 id="deadlock-vs-livelock-нет-прогресса-по-разным-причинам">Deadlock vs. livelock: нет прогресса по разным причинам</h1>
+<blockquote>
+<p>Потоки заблокированы или активно мешают друг другу</p>
+</blockquote>
+<p>← <a href="/java-concurrency-book/chapters/09-synchronized-vs-reentrant-lock/">synchronized vs. ReentrantLock</a> · <a href="/java-concurrency-book/chapters/10-visibility/">Почему изменения нужно «увидеть»</a> →</p>
+<h2 id="задача-перед-теорией-два-встречных-перевода">Задача перед теорией: два встречных перевода</h2>
+<p>Два потока одновременно переводят деньги между счетами:</p>
+<pre><code class="language-text">Thread 1: Account A → Account B
+Thread 2: Account B → Account A
+</code></pre>
+<p>Чтобы перевод был целостным, нужно заблокировать оба счёта. Наивная реализация сначала захватывает исходный счёт, затем целевой:</p>
+<pre><code class="language-java">void transfer(Account from, Account to, long amount) {
+    synchronized (from) {
+        synchronized (to) {
+            from.withdraw(amount);
+            to.deposit(amount);
+        }
+    }
+}
+</code></pre>
+<p>Возможен порядок:</p>
+<pre><code class="language-text">Thread 1 захватил A и ждёт B
+Thread 2 захватил B и ждёт A
+</code></pre>
+<p>Оба потока могут ждать бесконечно. Это deadlock (взаимная блокировка).</p>
+<p>Разработчик пробует «исправление»: если второй lock занят, освободить первый и немедленно повторить. Теперь потоки не заблокированы — они постоянно захватывают, проверяют и освобождают locks. Но при одинаковом ритме оба каждый раз уступают одновременно, и перевод всё равно не выполняется. Это livelock (активная взаимная блокировка).</p>
+<p>Симптом один — полезная операция не завершается. Механика принципиально разная.</p>
+<h2 id="общее-понятие-liveness">Общее понятие: liveness</h2>
+<p>Liveness (живость, способность системы продвигаться) отвечает на вопрос: «произойдёт ли когда-нибудь нужное событие?»</p>
+<p>Потокобезопасный код должен заботиться не только о safety (безопасности: ничего плохого не произойдёт), но и о прогрессе:</p>
+<pre><code class="language-text">safety   → баланс не повреждён
+liveness → перевод когда-нибудь завершится
+</code></pre>
+<p>Deadlock, livelock и starvation (голодание) — разные liveness failures (нарушения живости).</p>
+<table>
+<thead>
+<tr>
+<th>Проблема</th>
+<th>Состояние потоков</th>
+<th>Почему нет прогресса</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Deadlock</td>
+<td>ждут ресурсы друг друга</td>
+<td>образован цикл ожидания</td>
+</tr>
+<tr>
+<td>Livelock</td>
+<td>выполняются и меняют состояние</td>
+<td>реакции потоков взаимно отменяют прогресс</td>
+</tr>
+<tr>
+<td>Starvation</td>
+<td>один поток постоянно проигрывает конкуренцию</td>
+<td>ресурс достаётся другим потокам</td>
+</tr>
+</tbody>
+</table>
+<h2 id="deadlock-цикл-ожидания">Deadlock: цикл ожидания</h2>
+<p>Deadlock возникает не просто потому, что есть два locks. Для классической взаимной блокировки одновременно складываются четыре условия:</p>
+<ol>
+<li>mutual exclusion (взаимное исключение) — ресурсом владеет один поток;</li>
+<li>hold and wait (удержание и ожидание) — поток удерживает один ресурс и ждёт другой;</li>
+<li>no preemption (нет принудительного изъятия) — чужой lock нельзя просто отобрать;</li>
+<li>circular wait (циклическое ожидание) — цепочка ожиданий замыкается.</li>
+</ol>
+<pre><code class="language-text">Thread 1 держит A ──ждёт──→ B
+      ↑                         │
+      └──── A ←──ждёт── Thread 2 держит B
+</code></pre>
+<p>Для предотвращения достаточно гарантированно разрушить хотя бы одно условие. На практике чаще всего исключают цикл единым порядком захвата locks.</p>
+<h2 id="исправление-глобальный-порядок-locks">Исправление: глобальный порядок locks</h2>
+<p>Каждому счёту назначен неизменяемый <code>id</code>. Независимо от направления перевода сначала захватывается счёт с меньшим <code>id</code>:</p>
+<pre><code class="language-java">Account first = from.id() &lt; to.id() ? from : to;
+Account second = from.id() &lt; to.id() ? to : from;
+
+synchronized (first) {
+    synchronized (second) {
+        transferMoney(from, to, amount);
+    }
+}
+</code></pre>
+<p>Теперь оба встречных перевода запрашивают locks в порядке <code>A → B</code>. Один поток может ждать, но цикл <code>A → B → A</code> невозможен.</p>
+<p>Порядок должен быть:</p>
+<ul>
+<li>глобальным — одинаковым во всех местах программы;</li>
+<li>стабильным — ключ порядка не изменяется во время операции;</li>
+<li>полным — нужно определить порядок и для разных объектов с одинаковыми бизнес-значениями.</li>
+</ul>
+<h2 id="другие-способы-уменьшить-риск-deadlock">Другие способы уменьшить риск deadlock</h2>
+<ul>
+<li>не удерживать несколько locks одновременно;</li>
+<li>уменьшать область блокировки и не вызывать неизвестный внешний код под lock;</li>
+<li>объединить тесно связанное состояние под одним lock;</li>
+<li>использовать <code>tryLock(timeout, unit)</code> и корректно освобождать уже полученные locks;</li>
+<li>использовать <code>lockInterruptibly()</code>, если протокол допускает отмену ожидания;</li>
+<li>проектировать обмен через очереди или неизменяемые сообщения вместо совместного владения.</li>
+</ul>
+<p>Таймаут только позволяет выйти из ожидания. Он не доказывает, что операция будет завершена при следующей попытке.</p>
+<p>У входа в <code>synchronized</code> нет API с таймаутом и обычное ожидание intrinsic lock (встроенного lock объекта) нельзя прервать. Если нужны такие политики, рассматривают <code>ReentrantLock</code>.</p>
+<h2 id="livelock-активность-без-результата">Livelock: активность без результата</h2>
+<p>Представь двух людей в узком коридоре:</p>
+<pre><code class="language-text">оба шагнули влево
+оба увидели помеху и шагнули вправо
+оба снова увидели помеху и шагнули влево
+</code></pre>
+<p>Они не стоят: постоянно реагируют друг на друга. Но расстояние до цели не уменьшается.</p>
+<p>Аналогичная ошибка с <code>tryLock()</code>:</p>
+<pre><code class="language-java">while (!transferred) {
+    first.lock();
+    try {
+        if (second.tryLock()) {
+            try {
+                transferMoney();
+                transferred = true;
+            } finally {
+                second.unlock();
+            }
+        }
+    } finally {
+        first.unlock();
+    }
+}
+</code></pre>
+<p>Код не блокируется навсегда на втором lock, но симметричные потоки могут бесконечно повторять одинаковые неудачные действия.</p>
+<h2 id="как-разрушить-livelock">Как разрушить livelock</h2>
+<p>Нужно убрать идеальную симметрию или бесконечную взаимную реакцию:</p>
+<ul>
+<li>ввести единый порядок захвата locks — для переводов это лучше повторов;</li>
+<li>использовать bounded retries (ограниченное число повторов), после которого операция явно завершается ошибкой;</li>
+<li>добавить backoff (увеличивающуюся паузу между попытками);</li>
+<li>добавить jitter (случайный разброс задержки), чтобы потоки не повторяли шаги синхронно;</li>
+<li>назначить приоритет или одного координатора;</li>
+<li>блокировать операцию на уровне очереди, вместо того чтобы всем участникам немедленно уступать.</li>
+</ul>
+<p>Случайная задержка снижает вероятность повторной синхронизации, но не заменяет доказуемый протокол, если можно задать порядок ресурсов.</p>
+<h2 id="главное-различие">Главное различие</h2>
+<pre><code class="language-text">Deadlock
+Thread 1: BLOCKED, ждёт B
+Thread 2: BLOCKED, ждёт A
+CPU почти не используется
+
+Livelock
+Thread 1: захватил → проверил → отпустил → повторил
+Thread 2: захватил → проверил → отпустил → повторил
+CPU используется, полезного результата нет
+</code></pre>
+<p>Состояние <code>RUNNABLE</code> или <code>BLOCKED</code> помогает диагностике, но само по себе не является доказательством. Важен граф владения ресурсами и изменение бизнес-метрики прогресса.</p>
+<h2 id="как-обнаружить-deadlock">Как обнаружить deadlock</h2>
+<p>JVM умеет находить циклы владения мониторами и ownable synchronizers (синхронизаторами владения, например <code>ReentrantLock</code>):</p>
+<pre><code class="language-java">ThreadMXBean threads = ManagementFactory.getThreadMXBean();
+long[] ids = threads.findDeadlockedThreads();
+</code></pre>
+<p>Для работающего процесса полезен thread dump (дамп потоков). Его можно получить, например, через:</p>
+<pre><code class="language-bash">jcmd &lt;pid&gt; Thread.print
+</code></pre>
+<p>В дампе ищут:</p>
+<ul>
+<li>какие locks удерживает каждый поток;</li>
+<li>какой lock он ожидает;</li>
+<li>повторяющийся цикл между потоками;</li>
+<li>одинаковые stack traces на протяжении нескольких снимков.</li>
+</ul>
+<p><code>findMonitorDeadlockedThreads()</code> ищет только циклы intrinsic monitors, а <code>findDeadlockedThreads()</code> также учитывает ownable synchronizers.</p>
+<h2 id="почему-livelock-обнаруживать-сложнее">Почему livelock обнаруживать сложнее</h2>
+<p>При livelock нет обязательного цикла заблокированных threads. Thread dump может показывать <code>RUNNABLE</code>, а stack trace — постоянно меняющиеся попытки.</p>
+<p>Нужны наблюдения во времени:</p>
+<ul>
+<li>CPU и число попыток растут;</li>
+<li>полезный счётчик завершённых операций не растёт;</li>
+<li>логи повторяют один сценарий retry;</li>
+<li>несколько thread dumps показывают активность в одном цикле;</li>
+<li>профилировщик показывает горячий retry-loop.</li>
+</ul>
+<p>Поэтому системе полезны отдельные метрики <code>attempts</code>, <code>retries</code>, <code>failures</code> и <code>completed</code>, а не только признак «поток жив».</p>
+<h2 id="в-учебном-проекте">В учебном проекте</h2>
+<p>Модуль содержит три варианта:</p>
+<ul>
+<li><a href="https://github.com/tantarin/java-concurrency-examples/blob/761b996ffe4f208b463b5d212023f11ca7137eb3/liveness/deadlock-vs-livelock/src/main/java/io/github/tantarin/concurrency/liveness/DeadlockDemo.java#L11-L45" target="_blank">детерминированный deadlock двух monitors</a></li>
+<li><a href="https://github.com/tantarin/java-concurrency-examples/blob/761b996ffe4f208b463b5d212023f11ca7137eb3/liveness/deadlock-vs-livelock/src/main/java/io/github/tantarin/concurrency/liveness/DeadlockDemo.java#L21-L25" target="_blank">обнаружение цикла через <code>ThreadMXBean</code></a></li>
+<li><a href="https://github.com/tantarin/java-concurrency-examples/blob/761b996ffe4f208b463b5d212023f11ca7137eb3/liveness/deadlock-vs-livelock/src/main/java/io/github/tantarin/concurrency/liveness/LivelockDemo.java#L12-L55" target="_blank">детерминированная симуляция livelock</a></li>
+<li><a href="https://github.com/tantarin/java-concurrency-examples/blob/761b996ffe4f208b463b5d212023f11ca7137eb3/liveness/deadlock-vs-livelock/src/main/java/io/github/tantarin/concurrency/liveness/OrderedTransferService.java#L3-L20" target="_blank">предотвращение deadlock общим порядком locks</a></li>
+<li><a href="https://github.com/tantarin/java-concurrency-examples/blob/761b996ffe4f208b463b5d212023f11ca7137eb3/liveness/deadlock-vs-livelock/src/test/java/io/github/tantarin/concurrency/liveness/LivenessTest.java#L12-L37" target="_blank">тест активности без прогресса и встречных переводов</a></li>
+</ul>
+<p>Deadlock-демонстрация создаёт daemon threads (фоновые потоки), чтобы JVM могла завершиться после обнаружения цикла. Такой приём нужен только для безопасного учебного запуска, а не для исправления production-кода.</p>
+<h2 id="типичные-ошибки">Типичные ошибки</h2>
+<ul>
+<li>считать любой зависший запрос deadlock: причиной может быть медленный I/O, starvation или потерянное уведомление;</li>
+<li>лечить deadlock бесконечным <code>tryLock()</code> без backoff и получить livelock;</li>
+<li>вводить порядок locks только в одном методе, оставляя обратный порядок в другом;</li>
+<li>использовать таймаут как замену корректному освобождению ресурсов;</li>
+<li>анализировать один thread dump без сравнения во времени;</li>
+<li>считать высокую активность CPU доказательством полезного прогресса.</li>
+</ul>
+<h2 id="проверь-себя">Проверь себя</h2>
+<ol>
+<li>Чем состояние потоков при deadlock обычно отличается от livelock?</li>
+<li>Какие четыре условия нужны для классического deadlock?</li>
+<li>Как глобальный порядок locks разрушает circular wait?</li>
+<li>Почему немедленный retry может превратить deadlock в livelock?</li>
+<li>Какие две метрики помогли бы отличить полезную нагрузку от livelock?</li>
+<li>Чем starvation отличается от взаимной блокировки?</li>
+</ol>
+<h2 id="упражнение">Упражнение</h2>
+<p>Добавь третий счёт и запусти переводы <code>A → B</code>, <code>B → C</code> и <code>C → A</code> одновременно. Сначала продемонстрируй цикл при порядке «from, затем to», затем используй сортировку по <code>id</code> и проверь с таймаутом, что все операции завершаются.</p>
+<blockquote>
+<p><strong>Главная мысль:</strong> при deadlock потоки ждут ресурсы по замкнутому циклу; при livelock они продолжают выполнять код, но их реакции не дают полезного прогресса. Единый порядок ресурсов предотвращает цикл, а ограниченные повторы, backoff и асимметрия помогают не превратить ожидание в бесконечную суету.</p>
+</blockquote>
+<h2 id="первоисточники">Первоисточники</h2>
+<ul>
+<li><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/management/ThreadMXBean.html#findDeadlockedThreads--" target="_blank">Java API: <code>ThreadMXBean.findDeadlockedThreads()</code></a></li>
+<li><a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/locks/Lock.html" target="_blank">Java API: <code>Lock</code></a></li>
+<li><a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/locks/ReentrantLock.html" target="_blank">Java API: <code>ReentrantLock.tryLock()</code></a></li>
+</ul>
+<h2 id="дальше">Дальше</h2>
+<p>Мы научились защищать состояние, координировать потоки и замечать отсутствие прогресса. Теперь разберём ещё одно требование корректности: почему запись одного потока должна стать видна другому.</p>
+<hr>
+<p>← <a href="/java-concurrency-book/chapters/09-synchronized-vs-reentrant-lock/">synchronized vs. ReentrantLock</a> · <a href="/java-concurrency-book/chapters/10-visibility/">Почему изменения нужно «увидеть»</a> →</p>
+<nav class="pager"><a href="/java-concurrency-book/chapters/09-synchronized-vs-reentrant-lock/"><span>← Предыдущая</span>synchronized vs. ReentrantLock</a><a class="next" href="/java-concurrency-book/chapters/10-visibility/"><span>Следующая →</span>Почему изменения нужно «увидеть»</a></nav></article></main>
+<script>window.SITE_BASE="/java-concurrency-book/";window.CHAPTERS=[{"number":1,"title":"С чего начинается Java","file":"01-java-and-specification.md","slug":"01-java-and-specification","summary":"Язык и спецификация"},{"number":2,"title":"Зачем приложениям несколько потоков","file":"02-why-multiple-threads.md","slug":"02-why-multiple-threads","summary":"Практические примеры"},{"number":3,"title":"Что такое поток","file":"03-what-is-thread.md","slug":"03-what-is-thread","summary":"Process, stack и heap"},{"number":4,"title":"Где JVM хранит данные: stack, heap и не только","file":"03-java-memory.md","slug":"03-java-memory","summary":"Области памяти Java-процесса"},{"number":5,"title":"Наш сервис просмотров","file":"04-shared-mutable-state.md","slug":"04-shared-mutable-state","summary":"Общее изменяемое состояние"},{"number":6,"title":"Как теряется инкремент","file":"05-race-condition.md","slug":"05-race-condition","summary":"Состояние гонки и атомарность"},{"number":7,"title":"Race condition: когда результат зависит от порядка потоков","file":"05-race-condition-details.md","slug":"05-race-condition-details","summary":"Состояние гонки, гонка данных и способы исправления"},{"number":8,"title":"Mutex: один ключ от комнаты","file":"06-mutex.md","slug":"06-mutex","summary":"Mutual exclusion"},{"number":9,"title":"synchronized и монитор","file":"07-synchronized.md","slug":"07-synchronized","summary":"Первое исправление"},{"number":10,"title":"Почему lock — объект","file":"08-object-as-lock.md","slug":"08-object-as-lock","summary":"Identity и разные замки"},{"number":11,"title":"Где прячется lock у метода","file":"09-synchronized-method.md","slug":"09-synchronized-method","summary":"this и MyClass.class"},{"number":12,"title":"wait(), notify() и notifyAll(): ожидание условия","file":"09-wait-notify.md","slug":"09-wait-notify","summary":"Координация через монитор"},{"number":13,"title":"synchronized vs. ReentrantLock","file":"09-synchronized-vs-reentrant-lock.md","slug":"09-synchronized-vs-reentrant-lock","summary":"Встроенный monitor и явный lock"},{"number":14,"title":"Deadlock vs. livelock: нет прогресса по разным причинам","file":"09-deadlock-vs-livelock.md","slug":"09-deadlock-vs-livelock","summary":"Цикл ожидания и активность без результата"},{"number":15,"title":"Почему изменения нужно «увидеть»","file":"10-visibility.md","slug":"10-visibility","summary":"Видимость изменений"},{"number":16,"title":"Зачем придумали Java Memory Model","file":"11-java-memory-model.md","slug":"11-java-memory-model","summary":"JMM"},{"number":17,"title":"Happens-before простыми словами","file":"12-happens-before.md","slug":"12-happens-before","summary":"JLS 17.4.5"},{"number":18,"title":"Когда одного счётчика мало","file":"13-shared-map.md","slug":"13-shared-map","summary":"Переходим к Map"},{"number":19,"title":"synchronizedMap: Map с одним общим lock","file":"14-synchronized-map.md","slug":"14-synchronized-map","summary":"Когда выбирать синхронизированную обёртку"},{"number":20,"title":"Какие конкурентные коллекции есть в Java","file":"15-concurrent-collections-overview.md","slug":"15-concurrent-collections-overview","summary":"Map, queue, deque, set и copy-on-write"},{"number":21,"title":"Зачем ConcurrentHashMap","file":"15-concurrent-hash-map.md","slug":"15-concurrent-hash-map","summary":"Конкурентная коллекция"},{"number":22,"title":"Почему get и put недостаточно","file":"16-operation-composition.md","slug":"16-operation-composition","summary":"Композиция операций"},{"number":23,"title":"Атомарные compute и merge","file":"17-compute-and-merge.md","slug":"17-compute-and-merge","summary":"Правильное обновление"},{"number":24,"title":"Границы потокобезопасности computeIfAbsent","file":"17-compute-if-absent-safety.md","slug":"17-compute-if-absent-safety","summary":"Атомарная Map и изменяемое value"},{"number":25,"title":"Runnable vs. Callable: два контракта задачи","file":"18-runnable-vs-callable.md","slug":"18-runnable-vs-callable","summary":"Результат, исключения и Future"},{"number":26,"title":"Executor: задача отдельно от потока","file":"18-executor.md","slug":"18-executor","summary":"Пулы потоков"},{"number":27,"title":"Fork/Join: разделяем вычисление на подзадачи","file":"18-fork-join.md","slug":"18-fork-join","summary":"RecursiveTask и work stealing"},{"number":28,"title":"Виртуальные потоки в Java","file":"18-virtual-threads.md","slug":"18-virtual-threads","summary":"Virtual threads, carrier threads и блокирующий I/O"},{"number":29,"title":"Event loop в WebFlux: один диспетчер, много запросов","file":"18-event-loop-webflux.md","slug":"18-event-loop-webflux","summary":"Неблокирующий I/O небольшим числом потоков"},{"number":30,"title":"Как рассуждать о многопоточном коде","file":"19-reasoning-about-concurrency.md","slug":"19-reasoning-about-concurrency","summary":"Итог маршрута"}];</script><script src="/java-concurrency-book/assets/app.js"></script></body></html>

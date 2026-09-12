@@ -1,0 +1,12 @@
+{
+  "name": "java-concurrency-book-site",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node site/build.mjs",
+    "check": "node site/check.mjs"
+  },
+  "dependencies": {
+    "markdown-it": "^14.1.0"
+  }
+}
