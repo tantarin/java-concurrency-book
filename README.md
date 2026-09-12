@@ -40,6 +40,7 @@
 28. [Виртуальные потоки в Java](./chapters/18-virtual-threads.md) — Virtual threads, carrier threads и блокирующий I/O
 29. [Event loop в WebFlux: один диспетчер, много запросов](./chapters/18-event-loop-webflux.md) — Неблокирующий I/O небольшим числом потоков
 30. [Как рассуждать о многопоточном коде](./chapters/19-reasoning-about-concurrency.md) — Итог маршрута
+31. [Практикум: многопоточность на интервью в Revolut](./chapters/20-revolut-interview-practice.md) — Переводы, locks, deadlock, базы данных и concurrent-тесты
 
 ## Сквозной проект
 

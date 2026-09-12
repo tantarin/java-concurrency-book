@@ -2,7 +2,7 @@
 
 > Итог маршрута
 
-← [Event loop в WebFlux](./18-event-loop-webflux.md) · [Оглавление](../README.md) →
+← [Event loop в WebFlux](./18-event-loop-webflux.md) · [Оглавление](../README.md) · [Практикум Revolut](./20-revolut-interview-practice.md) →
 
 Мы начали со спецификации не случайно. Многопоточность проходит через исходный код, JVM, оптимизации JIT, планировщик и процессор. JMM связывает эти уровни единым набором гарантий.
 
@@ -33,8 +33,8 @@ atomicity + visibility
 
 ## Дальше
 
-Маршрут завершён. К любой главе можно вернуться через список или поиск.
+Основной маршрут завершён. Теперь можно применить его целиком в [практикуме по типовым задачам Java-интервью в Revolut](./20-revolut-interview-practice.md): найти общие данные, определить границу атомарности, выбрать блокировки и проверить решение конкурентным тестом.
 
 ---
 
-← [Event loop в WebFlux](./18-event-loop-webflux.md) · [Оглавление](../README.md) →
+← [Event loop в WebFlux](./18-event-loop-webflux.md) · [Оглавление](../README.md) · [Практикум Revolut](./20-revolut-interview-practice.md) →
