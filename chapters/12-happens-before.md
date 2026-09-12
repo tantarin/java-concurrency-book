@@ -2,7 +2,7 @@
 
 > JLS 17.4.5
 
-← [Зачем придумали Java Memory Model](./11-java-memory-model.md) · [Когда одного счётчика мало](./13-shared-map.md) →
+← [Java Memory Model: вся суть на одной странице](./11-java-memory-model.md) · [Когда одного счётчика мало](./13-shared-map.md) →
 
 **Happens-before (отношение «предшествует»)** — формальное отношение между действиями. Если A happens-before B, эффекты A должны быть видимы потоку, выполняющему B.
 
@@ -26,4 +26,4 @@ Thread 2: видит изменения
 
 ---
 
-← [Зачем придумали Java Memory Model](./11-java-memory-model.md) · [Когда одного счётчика мало](./13-shared-map.md) →
+← [Java Memory Model: вся суть на одной странице](./11-java-memory-model.md) · [Когда одного счётчика мало](./13-shared-map.md) →

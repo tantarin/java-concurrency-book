@@ -1,33 +1,238 @@
 <!doctype html>
 <html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Зачем придумали Java Memory Model · Многопоточность в Java</title><meta name="description" content="JMM">
+<title>Java Memory Model: вся суть на одной странице · Многопоточность в Java</title><meta name="description" content="Видимость, порядок, атомарность и happens-before">
 <link rel="stylesheet" href="/java-concurrency-book/assets/style.css"><link rel="icon" href="/java-concurrency-book/assets/favicon.svg" type="image/svg+xml">
 </head><body class="reader">
 <div class="reading-progress" id="reading-progress"></div>
 <header class="topbar"><a class="brand" href="/java-concurrency-book/"><span class="brand-mark">//</span><span>Java<br><b>Concurrency</b></span></a><button class="menu-button" id="menu-button" aria-label="Открыть оглавление">Оглавление</button><div class="top-actions"><button id="theme-button" class="icon-button" aria-label="Переключить тему">◐</button><a href="https://github.com/tantarin/java-concurrency-book" target="_blank">GitHub ↗</a></div></header>
-<aside class="sidebar" id="sidebar"><div class="sidebar-head"><p>Учебный маршрут</p><button id="close-menu" aria-label="Закрыть">×</button></div><label class="search"><span>⌕</span><input id="search" type="search" placeholder="Найти тему или главу"></label><nav id="chapter-nav"><a class="chapter-link" href="/java-concurrency-book/chapters/01-java-and-specification/"><span>01</span><div>С чего начинается Java<small>Язык и спецификация</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/02-why-multiple-threads/"><span>02</span><div>Зачем приложениям несколько потоков<small>Практические примеры</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/03-what-is-thread/"><span>03</span><div>Что такое поток<small>Process, stack и heap</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/03-java-memory/"><span>04</span><div>Где JVM хранит данные: stack, heap и не только<small>Области памяти Java-процесса</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/04-shared-mutable-state/"><span>05</span><div>Наш сервис просмотров<small>Общее изменяемое состояние</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/05-race-condition/"><span>06</span><div>Как теряется инкремент<small>Состояние гонки и атомарность</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/05-race-condition-details/"><span>07</span><div>Race condition: когда результат зависит от порядка потоков<small>Состояние гонки, гонка данных и способы исправления</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/06-mutex/"><span>08</span><div>Mutex: один ключ от комнаты<small>Mutual exclusion</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/07-synchronized/"><span>09</span><div>synchronized и монитор<small>Первое исправление</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/08-object-as-lock/"><span>10</span><div>Почему lock — объект<small>Identity и разные замки</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/09-synchronized-method/"><span>11</span><div>Где прячется lock у метода<small>this и MyClass.class</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/09-wait-notify/"><span>12</span><div>wait(), notify() и notifyAll(): ожидание условия<small>Координация через монитор</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/09-synchronized-vs-reentrant-lock/"><span>13</span><div>synchronized vs. ReentrantLock<small>Встроенный monitor и явный lock</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/09-deadlock-vs-livelock/"><span>14</span><div>Deadlock vs. livelock: нет прогресса по разным причинам<small>Цикл ожидания и активность без результата</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/10-visibility/"><span>15</span><div>Почему изменения нужно «увидеть»<small>Видимость изменений</small></div></a><a class="chapter-link active" href="/java-concurrency-book/chapters/11-java-memory-model/"><span>16</span><div>Зачем придумали Java Memory Model<small>JMM</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/12-happens-before/"><span>17</span><div>Happens-before простыми словами<small>JLS 17.4.5</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/13-shared-map/"><span>18</span><div>Когда одного счётчика мало<small>Переходим к Map</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/14-synchronized-map/"><span>19</span><div>synchronizedMap: Map с одним общим lock<small>Когда выбирать синхронизированную обёртку</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/15-concurrent-collections-overview/"><span>20</span><div>Какие конкурентные коллекции есть в Java<small>Map, queue, deque, set и copy-on-write</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/15-concurrent-hash-map/"><span>21</span><div>Зачем ConcurrentHashMap<small>Конкурентная коллекция</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/16-operation-composition/"><span>22</span><div>Почему get и put недостаточно<small>Композиция операций</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/17-compute-and-merge/"><span>23</span><div>Атомарные compute и merge<small>Правильное обновление</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/17-compute-if-absent-safety/"><span>24</span><div>Границы потокобезопасности computeIfAbsent<small>Атомарная Map и изменяемое value</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/18-runnable-vs-callable/"><span>25</span><div>Runnable vs. Callable: два контракта задачи<small>Результат, исключения и Future</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/18-executor/"><span>26</span><div>Executor: задача отдельно от потока<small>Пулы потоков</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/18-fork-join/"><span>27</span><div>Fork/Join: разделяем вычисление на подзадачи<small>RecursiveTask и work stealing</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/18-virtual-threads/"><span>28</span><div>Виртуальные потоки в Java<small>Virtual threads, carrier threads и блокирующий I/O</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/18-event-loop-webflux/"><span>29</span><div>Event loop в WebFlux: один диспетчер, много запросов<small>Неблокирующий I/O небольшим числом потоков</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/19-reasoning-about-concurrency/"><span>30</span><div>Как рассуждать о многопоточном коде<small>Итог маршрута</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/20-revolut-interview-practice/"><span>31</span><div>Практикум: многопоточность на интервью в Revolut<small>Переводы, locks, deadlock, базы данных и concurrent-тесты</small></div></a></nav><a class="glossary-link" href="/java-concurrency-book/glossary/">Aa&nbsp;&nbsp;Словарь терминов</a></aside>
-<main class="main reader"><article><div class="chapter-meta"><span>Глава 16 из 31</span><span>1 мин чтения</span></div><h1 id="зачем-придумали-java-memory-model">Зачем придумали Java Memory Model</h1>
+<aside class="sidebar" id="sidebar"><div class="sidebar-head"><p>Учебный маршрут</p><button id="close-menu" aria-label="Закрыть">×</button></div><label class="search"><span>⌕</span><input id="search" type="search" placeholder="Найти тему или главу"></label><nav id="chapter-nav"><a class="chapter-link" href="/java-concurrency-book/chapters/01-java-and-specification/"><span>01</span><div>С чего начинается Java<small>Язык и спецификация</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/02-why-multiple-threads/"><span>02</span><div>Зачем приложениям несколько потоков<small>Практические примеры</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/03-what-is-thread/"><span>03</span><div>Что такое поток<small>Process, stack и heap</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/03-java-memory/"><span>04</span><div>Где JVM хранит данные: stack, heap и не только<small>Области памяти Java-процесса</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/04-shared-mutable-state/"><span>05</span><div>Наш сервис просмотров<small>Общее изменяемое состояние</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/05-race-condition/"><span>06</span><div>Как теряется инкремент<small>Состояние гонки и атомарность</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/05-race-condition-details/"><span>07</span><div>Race condition: когда результат зависит от порядка потоков<small>Состояние гонки, гонка данных и способы исправления</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/06-mutex/"><span>08</span><div>Mutex: один ключ от комнаты<small>Mutual exclusion</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/07-synchronized/"><span>09</span><div>synchronized и монитор<small>Первое исправление</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/08-object-as-lock/"><span>10</span><div>Почему lock — объект<small>Identity и разные замки</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/09-synchronized-method/"><span>11</span><div>Где прячется lock у метода<small>this и MyClass.class</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/09-wait-notify/"><span>12</span><div>wait(), notify() и notifyAll(): ожидание условия<small>Координация через монитор</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/09-synchronized-vs-reentrant-lock/"><span>13</span><div>synchronized vs. ReentrantLock<small>Встроенный monitor и явный lock</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/09-deadlock-vs-livelock/"><span>14</span><div>Deadlock vs. livelock: нет прогресса по разным причинам<small>Цикл ожидания и активность без результата</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/10-visibility/"><span>15</span><div>Почему изменения нужно «увидеть»<small>Видимость изменений</small></div></a><a class="chapter-link active" href="/java-concurrency-book/chapters/11-java-memory-model/"><span>16</span><div>Java Memory Model: вся суть на одной странице<small>Видимость, порядок, атомарность и happens-before</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/12-happens-before/"><span>17</span><div>Happens-before простыми словами<small>JLS 17.4.5</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/13-shared-map/"><span>18</span><div>Когда одного счётчика мало<small>Переходим к Map</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/14-synchronized-map/"><span>19</span><div>synchronizedMap: Map с одним общим lock<small>Когда выбирать синхронизированную обёртку</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/15-concurrent-collections-overview/"><span>20</span><div>Какие конкурентные коллекции есть в Java<small>Map, queue, deque, set и copy-on-write</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/15-concurrent-hash-map/"><span>21</span><div>Зачем ConcurrentHashMap<small>Конкурентная коллекция</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/16-operation-composition/"><span>22</span><div>Почему get и put недостаточно<small>Композиция операций</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/17-compute-and-merge/"><span>23</span><div>Атомарные compute и merge<small>Правильное обновление</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/17-compute-if-absent-safety/"><span>24</span><div>Границы потокобезопасности computeIfAbsent<small>Атомарная Map и изменяемое value</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/18-runnable-vs-callable/"><span>25</span><div>Runnable vs. Callable: два контракта задачи<small>Результат, исключения и Future</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/18-executor/"><span>26</span><div>Executor: задача отдельно от потока<small>Пулы потоков</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/18-fork-join/"><span>27</span><div>Fork/Join: разделяем вычисление на подзадачи<small>RecursiveTask и work stealing</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/18-virtual-threads/"><span>28</span><div>Виртуальные потоки в Java<small>Virtual threads, carrier threads и блокирующий I/O</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/18-event-loop-webflux/"><span>29</span><div>Event loop в WebFlux: один диспетчер, много запросов<small>Неблокирующий I/O небольшим числом потоков</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/19-reasoning-about-concurrency/"><span>30</span><div>Как рассуждать о многопоточном коде<small>Итог маршрута</small></div></a><a class="chapter-link" href="/java-concurrency-book/chapters/20-revolut-interview-practice/"><span>31</span><div>Практикум: многопоточность на интервью в Revolut<small>Переводы, locks, deadlock, базы данных и concurrent-тесты</small></div></a></nav><a class="glossary-link" href="/java-concurrency-book/glossary/">Aa&nbsp;&nbsp;Словарь терминов</a></aside>
+<main class="main reader"><article><div class="chapter-meta"><span>Глава 16 из 31</span><span>7 мин чтения</span></div><h1 id="java-memory-model-вся-суть-на-одной-странице">Java Memory Model: вся суть на одной странице</h1>
 <blockquote>
-<p>JMM</p>
+<p>Видимость, порядок, атомарность и happens-before без лишней теории</p>
 </blockquote>
 <p>← <a href="/java-concurrency-book/chapters/10-visibility/">Почему изменения нужно «увидеть»</a> · <a href="/java-concurrency-book/chapters/12-happens-before/">Happens-before простыми словами</a> →</p>
-<p><strong>Java Memory Model (модель памяти Java)</strong> — не программа, управляющая потоками, и не алгоритм конкретной JVM. Это часть спецификации: набор правил о допустимых результатах многопоточного выполнения.</p>
-<p>Разработчик по ним понимает, какие значения может наблюдать программа. Авторы JVM и JIT знают, какие оптимизации разрешены. Реализация JVM переводит эти гарантии на инструкции конкретного процессора.</p>
-<pre><code class="language-java">разработчик пишет код
-        ↓
-JMM задаёт гарантии
-        ↓
-JVM и JIT оптимизируют
-        ↓
-CPU исполняет инструкции
-</code></pre>
-<p>Потоки описаны в главе 17 JLS — <em>Threads and Locks</em>. Без общих правил одна многопоточная программа могла бы иметь несовместимое поведение на разных реализациях.</p>
+<p><strong>Java Memory Model (модель памяти Java), или JMM</strong>, — часть спецификации Java, которая отвечает на один вопрос:</p>
 <blockquote>
-<p>JMM не делает любой код безопасным. Она определяет, какие гарантии создают правильные средства синхронизации.</p>
+<p>Какие значения разрешено увидеть потоку, когда с общей памятью работают несколько потоков?</p>
 </blockquote>
+<p>JMM — не сборщик мусора, не устройство heap и не алгоритм JVM. Она задаёт правила, которые обязаны соблюдать компилятор, JIT и процессор. Благодаря этому правильно синхронизированная Java-программа имеет предсказуемый смысл на разных компьютерах.</p>
+<pre><code class="language-text">Java-код
+   ↓
+JMM: какие результаты допустимы
+   ↓
+JIT и CPU: как угодно оптимизируют код,
+но не нарушают эти гарантии
+</code></pre>
+<h2 id="три-проблемы-которые-нужно-различать">Три проблемы, которые нужно различать</h2>
+<table>
+<thead>
+<tr>
+<th>Проблема</th>
+<th>Простой вопрос</th>
+<th>Пример</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Atomicity (атомарность)</strong></td>
+<td>Может ли другой поток вклиниться в операцию?</td>
+<td><code>count++</code> состоит из чтения, сложения и записи</td>
+</tr>
+<tr>
+<td><strong>Visibility (видимость)</strong></td>
+<td>Обязан ли поток увидеть чужую запись?</td>
+<td>один поток написал <code>ready = true</code>, другой всё ещё читает <code>false</code></td>
+</tr>
+<tr>
+<td><strong>Ordering (порядок)</strong></td>
+<td>Могут ли операции наблюдаться в другом порядке?</td>
+<td>другой поток увидел <code>ready == true</code>, но не увидел записанные перед ним данные</td>
+</tr>
+</tbody>
+</table>
+<p>Это независимые свойства. Например, чтение и запись <code>volatile int</code> атомарны и видимы, но выражение <code>count++</code> всё равно не становится одной атомарной операцией.</p>
+<h2 id="почему-исходного-порядка-кода-недостаточно">Почему исходного порядка кода недостаточно</h2>
+<p>Внутри одного потока Java сохраняет поведение программы так, будто инструкции выполнялись по порядку. Это называют <strong>as-if-serial semantics (семантика «как если бы последовательно»)</strong>.</p>
+<p>Но JIT и процессор вправе переупорядочить независимые операции. Один поток разницы не заметит, а другой без синхронизации может увидеть промежуточное состояние.</p>
+<pre><code class="language-java">int value = 0;
+boolean ready = false;
+
+// Поток A
+value = 42;
+ready = true;
+
+// Поток B
+if (ready) {
+    System.out.println(value); // без связи между потоками нет нужной гарантии
+}
+</code></pre>
+<p>Ошибка здесь не в кеше конкретного процессора. Ошибка в том, что программа не создала предусмотренную JMM связь между записью и чтением.</p>
+<h2 id="главное-правило-happens-before">Главное правило: happens-before</h2>
+<p><strong>Happens-before (отношение «предшествует»)</strong> — гарантия передачи результатов одного действия другому.</p>
+<p>Если действие A <em>happens-before</em> действию B, то:</p>
+<ol>
+<li>результаты A обязаны быть видимы в B;</li>
+<li>A наблюдается до B с точки зрения программы.</li>
+</ol>
+<pre><code class="language-text">записи данных в потоке A
+          ↓
+     release-действие
+          ║  happens-before
+     acquire-действие
+          ↓
+чтение данных в потоке B
+</code></pre>
+<p>Здесь <strong>release (освобождение)</strong> публикует предыдущие изменения, а соответствующий <strong>acquire (получение)</strong> делает их доступными читающему потоку. В Java разработчик обычно не ставит барьеры памяти вручную — нужную связь создают языковые конструкции и библиотеки.</p>
+<h2 id="что-создаёт-happens-before">Что создаёт happens-before</h2>
+<table>
+<thead>
+<tr>
+<th>В потоке A</th>
+<th>Связь</th>
+<th>В потоке B</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>выход из <code>synchronized(lock)</code></td>
+<td>на том же объекте <code>lock</code></td>
+<td>последующий вход в <code>synchronized(lock)</code></td>
+</tr>
+<tr>
+<td>запись в <code>volatile</code>-поле</td>
+<td>для того же поля</td>
+<td>последующее чтение этого поля</td>
+</tr>
+<tr>
+<td>действия до <code>thread.start()</code></td>
+<td>передаются запущенному потоку</td>
+<td>первые действия нового потока</td>
+</tr>
+<tr>
+<td>все действия потока</td>
+<td>передаются ожидающему</td>
+<td>успешный возврат из <code>thread.join()</code></td>
+</tr>
+<tr>
+<td>запись до завершения задачи</td>
+<td>через контракт библиотеки</td>
+<td>получение результата из <code>Future.get()</code></td>
+</tr>
+</tbody>
+</table>
+<p>Также действуют два общих правила:</p>
+<ul>
+<li><strong>program order (порядок программы):</strong> более раннее действие потока happens-before более позднего действия того же потока;</li>
+<li><strong>transitivity (транзитивность):</strong> если A happens-before B, а B happens-before C, то A happens-before C.</li>
+</ul>
+<p>Следующая глава разбирает эти связи подробнее.</p>
+<p>У <code>final</code>-полей есть отдельная гарантия инициализации: если ссылка на объект не утекла из конструктора, другой поток, получивший эту ссылку, увидит корректно сконструированные значения <code>final</code>-полей. Это специальное правило JMM, а не ещё одна строка обычного happens-before.</p>
+<h2 id="исправляем-пример-через-volatile">Исправляем пример через volatile</h2>
+<pre><code class="language-java">int value = 0;
+volatile boolean ready = false;
+
+// Поток A
+value = 42;       // 1
+ready = true;     // 2: volatile write
+
+// Поток B
+if (ready) {      // 3: volatile read
+    System.out.println(value); // 4: гарантированно 42
+}
+</code></pre>
+<p>Получается цепочка:</p>
+<pre><code class="language-text">1 → 2 → 3 → 4
+</code></pre>
+<ul>
+<li><code>1 → 2</code> и <code>3 → 4</code> следуют из порядка программы;</li>
+<li><code>2 → 3</code> — правило записи и чтения одного <code>volatile</code>-поля;</li>
+<li>значит, по транзитивности <code>1 → 4</code>, и значение <code>42</code> видно потоку B.</li>
+</ul>
+<p><code>volatile</code> здесь подходит, потому что один поток публикует готовые данные, а другой их читает. Если оба потока делают составное изменение вроде <code>count++</code>, нужны <code>AtomicInteger</code>, <code>synchronized</code> или другой инструмент атомарного обновления.</p>
+<h2 id="data-race-и-правильно-синхронизированная-программа">Data race и правильно синхронизированная программа</h2>
+<p><strong>Data race (гонка данных)</strong> возникает, когда два потока обращаются к одной переменной, хотя бы один пишет, а действия не упорядочены через happens-before.</p>
+<pre><code class="language-text">одна переменная + разные потоки + хотя бы одна запись
+                    + нет happens-before
+                    = data race
+</code></pre>
+<p>Для <strong>правильно синхронизированной программы</strong> без гонок данных JMM даёт сильную практическую гарантию: её выполнение выглядит <strong>sequentially consistent (последовательно согласованным)</strong> — как некоторое чередование действий потоков, сохраняющее порядок каждого потока.</p>
+<p>Это не означает, что потоки реально исполняются последовательно. Это означает, что результат можно объяснить допустимым последовательным чередованием.</p>
+<h2 id="что-выбрать-на-практике">Что выбрать на практике</h2>
+<table>
+<thead>
+<tr>
+<th>Задача</th>
+<th>Обычно подходит</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>опубликовать флаг или неизменяемое состояние</td>
+<td><code>volatile</code></td>
+</tr>
+<tr>
+<td>атомарно обновить один счётчик</td>
+<td><code>AtomicInteger</code>, <code>AtomicLong</code>, иногда <code>LongAdder</code></td>
+</tr>
+<tr>
+<td>защитить несколько связанных полей и инвариант</td>
+<td><code>synchronized</code> или <code>Lock</code></td>
+</tr>
+<tr>
+<td>передавать задачи и результаты</td>
+<td><code>ExecutorService</code>, <code>Future</code>, concurrent collections</td>
+</tr>
+<tr>
+<td>опубликовать неизменяемый объект</td>
+<td>корректный конструктор, <code>final</code>-поля и безопасная публикация</td>
+</tr>
+</tbody>
+</table>
+<p>Лучше выбирать высокоуровневый инструмент, контракт которого уже создаёт необходимые гарантии, а не пытаться рассуждать о кешах и memory barrier для каждой строки.</p>
+<h2 id="частые-ошибки-на-собеседовании">Частые ошибки на собеседовании</h2>
+<h3 id="volatile-делает-операцию-атомарной">«volatile делает операцию атомарной»</h3>
+<p>Нет. <code>volatile</code> даёт видимость и порядок для работы с полем, но не склеивает read-modify-write операцию:</p>
+<pre><code class="language-java">volatile int count;
+count++; // всё ещё read → add → write
+</code></pre>
+<h3 id="synchronized-нужен-только-для-взаимного-исключения">«synchronized нужен только для взаимного исключения»</h3>
+<p>Нет. Выход из монитора публикует сделанные изменения, а следующий вход в тот же монитор их получает. Важно, что монитор должен быть <strong>тем же объектом</strong>.</p>
+<h3 id="happens-before-означает-раньше-по-времени">«happens-before означает раньше по времени»</h3>
+<p>Нет. Это отношение, заданное спецификацией. Операция может физически произойти раньше, но без happens-before другой поток не получает гарантии видимости.</p>
+<h3 id="каждый-поток-хранит-отдельную-копию-heap">«каждый поток хранит отдельную копию heap»</h3>
+<p>Нет. Heap общий. Регистры, кеши и оптимизации влияют на наблюдаемое поведение, но JMM описывает гарантии через действия программы, а не через упрощённую модель «главной памяти» и отдельных копий.</p>
+<h2 id="ответ-про-jmm-за-40-секунд">Ответ про JMM за 40 секунд</h2>
+<blockquote>
+<p>JMM — часть спецификации Java, которая определяет допустимые результаты многопоточного выполнения: когда записи одного потока обязаны быть видимы другому и какой порядок действий гарантирован. Три связанные проблемы — atomicity, visibility и ordering. Основной инструмент рассуждения — happens-before. Его создают, например, один монитор <code>synchronized</code>, запись и чтение одного <code>volatile</code>-поля, <code>Thread.start()</code>, <code>Thread.join()</code> и контракты concurrent-библиотек. Если конфликтующие обращения не связаны happens-before, возникает data race, и полагаться на наблюдаемый порядок нельзя.</p>
+</blockquote>
+<h2 id="как-разобрать-любой-пример">Как разобрать любой пример</h2>
+<ol>
+<li>Найди общие изменяемые данные.</li>
+<li>Отметь все чтения и записи из разных потоков.</li>
+<li>Найди синхронизирующие действия: <code>volatile</code>, один monitor, <code>start</code>, <code>join</code>, concurrent API.</li>
+<li>Построй цепочку happens-before от записи к чтению.</li>
+<li>Если цепочки нет — гарантии видимости нет.</li>
+<li>Отдельно проверь, не является ли операция составной, например <code>++</code>, <code>check-then-act</code> или <code>get</code> + <code>put</code>.</li>
+</ol>
+<h2 id="самопроверка">Самопроверка</h2>
+<ol>
+<li>Делает ли <code>volatile</code> выражение <code>counter++</code> атомарным?</li>
+<li>Передаёт ли выход из <code>synchronized(a)</code> видимость входу в <code>synchronized(b)</code>?</li>
+<li>Почему запись обычного поля перед записью <code>volatile</code>-флага становится видна после чтения флага?</li>
+<li>Чем data race отличается от race condition?</li>
+</ol>
+<details>
+<summary>Ответы</summary>
+<ol>
+<li>Нет: это три действия — чтение, сложение и запись.</li>
+<li>Нет, если <code>a</code> и <code>b</code> — разные объекты.</li>
+<li>Из-за порядка программы, volatile happens-before и транзитивности.</li>
+<li>Data race — формальное отсутствие happens-before между конфликтующими доступами; race condition — более широкая логическая зависимость результата от порядка событий.</li>
+</ol>
+</details>
 <h2 id="дальше">Дальше</h2>
-<p>Чтобы точно связывать записи и последующие чтения, спецификация использует отношение happens-before.</p>
+<p>Теперь карта JMM собрана целиком. Дальше разберём отношение happens-before отдельно и научимся находить его в коде.</p>
 <hr>
 <p>← <a href="/java-concurrency-book/chapters/10-visibility/">Почему изменения нужно «увидеть»</a> · <a href="/java-concurrency-book/chapters/12-happens-before/">Happens-before простыми словами</a> →</p>
 <nav class="pager"><a href="/java-concurrency-book/chapters/10-visibility/"><span>← Предыдущая</span>Почему изменения нужно «увидеть»</a><a class="next" href="/java-concurrency-book/chapters/12-happens-before/"><span>Следующая →</span>Happens-before простыми словами</a></nav></article></main>
-<script>window.SITE_BASE="/java-concurrency-book/";window.CHAPTERS=[{"number":1,"title":"С чего начинается Java","file":"01-java-and-specification.md","slug":"01-java-and-specification","summary":"Язык и спецификация"},{"number":2,"title":"Зачем приложениям несколько потоков","file":"02-why-multiple-threads.md","slug":"02-why-multiple-threads","summary":"Практические примеры"},{"number":3,"title":"Что такое поток","file":"03-what-is-thread.md","slug":"03-what-is-thread","summary":"Process, stack и heap"},{"number":4,"title":"Где JVM хранит данные: stack, heap и не только","file":"03-java-memory.md","slug":"03-java-memory","summary":"Области памяти Java-процесса"},{"number":5,"title":"Наш сервис просмотров","file":"04-shared-mutable-state.md","slug":"04-shared-mutable-state","summary":"Общее изменяемое состояние"},{"number":6,"title":"Как теряется инкремент","file":"05-race-condition.md","slug":"05-race-condition","summary":"Состояние гонки и атомарность"},{"number":7,"title":"Race condition: когда результат зависит от порядка потоков","file":"05-race-condition-details.md","slug":"05-race-condition-details","summary":"Состояние гонки, гонка данных и способы исправления"},{"number":8,"title":"Mutex: один ключ от комнаты","file":"06-mutex.md","slug":"06-mutex","summary":"Mutual exclusion"},{"number":9,"title":"synchronized и монитор","file":"07-synchronized.md","slug":"07-synchronized","summary":"Первое исправление"},{"number":10,"title":"Почему lock — объект","file":"08-object-as-lock.md","slug":"08-object-as-lock","summary":"Identity и разные замки"},{"number":11,"title":"Где прячется lock у метода","file":"09-synchronized-method.md","slug":"09-synchronized-method","summary":"this и MyClass.class"},{"number":12,"title":"wait(), notify() и notifyAll(): ожидание условия","file":"09-wait-notify.md","slug":"09-wait-notify","summary":"Координация через монитор"},{"number":13,"title":"synchronized vs. ReentrantLock","file":"09-synchronized-vs-reentrant-lock.md","slug":"09-synchronized-vs-reentrant-lock","summary":"Встроенный monitor и явный lock"},{"number":14,"title":"Deadlock vs. livelock: нет прогресса по разным причинам","file":"09-deadlock-vs-livelock.md","slug":"09-deadlock-vs-livelock","summary":"Цикл ожидания и активность без результата"},{"number":15,"title":"Почему изменения нужно «увидеть»","file":"10-visibility.md","slug":"10-visibility","summary":"Видимость изменений"},{"number":16,"title":"Зачем придумали Java Memory Model","file":"11-java-memory-model.md","slug":"11-java-memory-model","summary":"JMM"},{"number":17,"title":"Happens-before простыми словами","file":"12-happens-before.md","slug":"12-happens-before","summary":"JLS 17.4.5"},{"number":18,"title":"Когда одного счётчика мало","file":"13-shared-map.md","slug":"13-shared-map","summary":"Переходим к Map"},{"number":19,"title":"synchronizedMap: Map с одним общим lock","file":"14-synchronized-map.md","slug":"14-synchronized-map","summary":"Когда выбирать синхронизированную обёртку"},{"number":20,"title":"Какие конкурентные коллекции есть в Java","file":"15-concurrent-collections-overview.md","slug":"15-concurrent-collections-overview","summary":"Map, queue, deque, set и copy-on-write"},{"number":21,"title":"Зачем ConcurrentHashMap","file":"15-concurrent-hash-map.md","slug":"15-concurrent-hash-map","summary":"Конкурентная коллекция"},{"number":22,"title":"Почему get и put недостаточно","file":"16-operation-composition.md","slug":"16-operation-composition","summary":"Композиция операций"},{"number":23,"title":"Атомарные compute и merge","file":"17-compute-and-merge.md","slug":"17-compute-and-merge","summary":"Правильное обновление"},{"number":24,"title":"Границы потокобезопасности computeIfAbsent","file":"17-compute-if-absent-safety.md","slug":"17-compute-if-absent-safety","summary":"Атомарная Map и изменяемое value"},{"number":25,"title":"Runnable vs. Callable: два контракта задачи","file":"18-runnable-vs-callable.md","slug":"18-runnable-vs-callable","summary":"Результат, исключения и Future"},{"number":26,"title":"Executor: задача отдельно от потока","file":"18-executor.md","slug":"18-executor","summary":"Пулы потоков"},{"number":27,"title":"Fork/Join: разделяем вычисление на подзадачи","file":"18-fork-join.md","slug":"18-fork-join","summary":"RecursiveTask и work stealing"},{"number":28,"title":"Виртуальные потоки в Java","file":"18-virtual-threads.md","slug":"18-virtual-threads","summary":"Virtual threads, carrier threads и блокирующий I/O"},{"number":29,"title":"Event loop в WebFlux: один диспетчер, много запросов","file":"18-event-loop-webflux.md","slug":"18-event-loop-webflux","summary":"Неблокирующий I/O небольшим числом потоков"},{"number":30,"title":"Как рассуждать о многопоточном коде","file":"19-reasoning-about-concurrency.md","slug":"19-reasoning-about-concurrency","summary":"Итог маршрута"},{"number":31,"title":"Практикум: многопоточность на интервью в Revolut","file":"20-revolut-interview-practice.md","slug":"20-revolut-interview-practice","summary":"Переводы, locks, deadlock, базы данных и concurrent-тесты"}];</script><script src="/java-concurrency-book/assets/app.js"></script></body></html>
+<script>window.SITE_BASE="/java-concurrency-book/";window.CHAPTERS=[{"number":1,"title":"С чего начинается Java","file":"01-java-and-specification.md","slug":"01-java-and-specification","summary":"Язык и спецификация"},{"number":2,"title":"Зачем приложениям несколько потоков","file":"02-why-multiple-threads.md","slug":"02-why-multiple-threads","summary":"Практические примеры"},{"number":3,"title":"Что такое поток","file":"03-what-is-thread.md","slug":"03-what-is-thread","summary":"Process, stack и heap"},{"number":4,"title":"Где JVM хранит данные: stack, heap и не только","file":"03-java-memory.md","slug":"03-java-memory","summary":"Области памяти Java-процесса"},{"number":5,"title":"Наш сервис просмотров","file":"04-shared-mutable-state.md","slug":"04-shared-mutable-state","summary":"Общее изменяемое состояние"},{"number":6,"title":"Как теряется инкремент","file":"05-race-condition.md","slug":"05-race-condition","summary":"Состояние гонки и атомарность"},{"number":7,"title":"Race condition: когда результат зависит от порядка потоков","file":"05-race-condition-details.md","slug":"05-race-condition-details","summary":"Состояние гонки, гонка данных и способы исправления"},{"number":8,"title":"Mutex: один ключ от комнаты","file":"06-mutex.md","slug":"06-mutex","summary":"Mutual exclusion"},{"number":9,"title":"synchronized и монитор","file":"07-synchronized.md","slug":"07-synchronized","summary":"Первое исправление"},{"number":10,"title":"Почему lock — объект","file":"08-object-as-lock.md","slug":"08-object-as-lock","summary":"Identity и разные замки"},{"number":11,"title":"Где прячется lock у метода","file":"09-synchronized-method.md","slug":"09-synchronized-method","summary":"this и MyClass.class"},{"number":12,"title":"wait(), notify() и notifyAll(): ожидание условия","file":"09-wait-notify.md","slug":"09-wait-notify","summary":"Координация через монитор"},{"number":13,"title":"synchronized vs. ReentrantLock","file":"09-synchronized-vs-reentrant-lock.md","slug":"09-synchronized-vs-reentrant-lock","summary":"Встроенный monitor и явный lock"},{"number":14,"title":"Deadlock vs. livelock: нет прогресса по разным причинам","file":"09-deadlock-vs-livelock.md","slug":"09-deadlock-vs-livelock","summary":"Цикл ожидания и активность без результата"},{"number":15,"title":"Почему изменения нужно «увидеть»","file":"10-visibility.md","slug":"10-visibility","summary":"Видимость изменений"},{"number":16,"title":"Java Memory Model: вся суть на одной странице","file":"11-java-memory-model.md","slug":"11-java-memory-model","summary":"Видимость, порядок, атомарность и happens-before"},{"number":17,"title":"Happens-before простыми словами","file":"12-happens-before.md","slug":"12-happens-before","summary":"JLS 17.4.5"},{"number":18,"title":"Когда одного счётчика мало","file":"13-shared-map.md","slug":"13-shared-map","summary":"Переходим к Map"},{"number":19,"title":"synchronizedMap: Map с одним общим lock","file":"14-synchronized-map.md","slug":"14-synchronized-map","summary":"Когда выбирать синхронизированную обёртку"},{"number":20,"title":"Какие конкурентные коллекции есть в Java","file":"15-concurrent-collections-overview.md","slug":"15-concurrent-collections-overview","summary":"Map, queue, deque, set и copy-on-write"},{"number":21,"title":"Зачем ConcurrentHashMap","file":"15-concurrent-hash-map.md","slug":"15-concurrent-hash-map","summary":"Конкурентная коллекция"},{"number":22,"title":"Почему get и put недостаточно","file":"16-operation-composition.md","slug":"16-operation-composition","summary":"Композиция операций"},{"number":23,"title":"Атомарные compute и merge","file":"17-compute-and-merge.md","slug":"17-compute-and-merge","summary":"Правильное обновление"},{"number":24,"title":"Границы потокобезопасности computeIfAbsent","file":"17-compute-if-absent-safety.md","slug":"17-compute-if-absent-safety","summary":"Атомарная Map и изменяемое value"},{"number":25,"title":"Runnable vs. Callable: два контракта задачи","file":"18-runnable-vs-callable.md","slug":"18-runnable-vs-callable","summary":"Результат, исключения и Future"},{"number":26,"title":"Executor: задача отдельно от потока","file":"18-executor.md","slug":"18-executor","summary":"Пулы потоков"},{"number":27,"title":"Fork/Join: разделяем вычисление на подзадачи","file":"18-fork-join.md","slug":"18-fork-join","summary":"RecursiveTask и work stealing"},{"number":28,"title":"Виртуальные потоки в Java","file":"18-virtual-threads.md","slug":"18-virtual-threads","summary":"Virtual threads, carrier threads и блокирующий I/O"},{"number":29,"title":"Event loop в WebFlux: один диспетчер, много запросов","file":"18-event-loop-webflux.md","slug":"18-event-loop-webflux","summary":"Неблокирующий I/O небольшим числом потоков"},{"number":30,"title":"Как рассуждать о многопоточном коде","file":"19-reasoning-about-concurrency.md","slug":"19-reasoning-about-concurrency","summary":"Итог маршрута"},{"number":31,"title":"Практикум: многопоточность на интервью в Revolut","file":"20-revolut-interview-practice.md","slug":"20-revolut-interview-practice","summary":"Переводы, locks, deadlock, базы данных и concurrent-тесты"}];</script><script src="/java-concurrency-book/assets/app.js"></script></body></html>

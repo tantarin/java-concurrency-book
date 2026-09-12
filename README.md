@@ -25,7 +25,7 @@
 13. [synchronized vs. ReentrantLock](./chapters/09-synchronized-vs-reentrant-lock.md) — Встроенный monitor и явный lock
 14. [Deadlock vs. livelock: нет прогресса по разным причинам](./chapters/09-deadlock-vs-livelock.md) — Цикл ожидания и активность без результата
 15. [Почему изменения нужно «увидеть»](./chapters/10-visibility.md) — Видимость изменений
-16. [Зачем придумали Java Memory Model](./chapters/11-java-memory-model.md) — JMM
+16. [Java Memory Model: вся суть на одной странице](./chapters/11-java-memory-model.md) — Видимость, порядок, атомарность и happens-before
 17. [Happens-before простыми словами](./chapters/12-happens-before.md) — JLS 17.4.5
 18. [Когда одного счётчика мало](./chapters/13-shared-map.md) — Переходим к Map
 19. [synchronizedMap: Map с одним общим lock](./chapters/14-synchronized-map.md) — Когда выбирать синхронизированную обёртку
